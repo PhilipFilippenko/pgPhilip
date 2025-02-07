@@ -5,26 +5,28 @@ using UnityEngine;
 public class RayCastScript : MonoBehaviour
 {
     PlayerMovement thePlayer;
-    // Start is called before the first frame update
+    float raycastCooldown = 0.1f;
+    float nextRaycastTime = 0f;
+
     void Start()
     {
         thePlayer = FindObjectOfType<PlayerMovement>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(1) && Time.time >= nextRaycastTime)
         {
-            Ray  ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            nextRaycastTime = Time.time + raycastCooldown;
 
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
             if (Physics.Raycast(ray, out hit))
             {
+                //Debug.Log("Raycast hit: " + hit.collider.name);
                 thePlayer.setDestination(hit.point);
             }
         }
-        
     }
 }
