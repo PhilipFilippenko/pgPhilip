@@ -6,35 +6,44 @@ public class PlayerMovement : MonoBehaviour
 {
     private Vector3 targetDestination;
     bool isMoving = false;
-    float speed = 3;
+    float speed = 6f;
+    float rotationSpeed = 15f;
+    Vector3 movementDirection;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
     void Update()
     {
         if (isMoving)
         {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation((targetDestination - transform.position).normalized), 0.01f);
-            transform.position += transform.forward * speed * Time.deltaTime;
+            if (movementDirection != Vector3.zero)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(movementDirection);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            }
 
-            if (Vector3.Distance(transform.position, targetDestination) < 0.1f)
+            transform.position += movementDirection * speed * Time.deltaTime;
+
+            if (Vector3.Distance(transform.position, targetDestination) < 0.01f)
             {
                 isMoving = false;
                 transform.position = targetDestination;
-
             }
         }
     }
 
-
     internal void setDestination(Vector3 destination)
     {
-        targetDestination = new Vector3( destination.x , transform.position.y , destination.z);
+        if (Vector3.Distance(transform.position, destination) < 0.1f)
+        {
+            return;
+        }
+
+        targetDestination = new Vector3(destination.x, transform.position.y, destination.z);
+        movementDirection = (targetDestination - transform.position).normalized;
         isMoving = true;
+    }
+
+    public void SetRotationSpeed(float newRotationSpeed)
+    {
+        rotationSpeed = newRotationSpeed;
     }
 }
