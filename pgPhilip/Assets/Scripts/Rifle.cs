@@ -1,20 +1,20 @@
 using UnityEngine;
 
-public class Pistol : WeaponBase
+public class Rifle : WeaponBase
 {
     public float bulletSpawnOffset = 1f;
 
     void Start()
     {
-        weaponName = "Pistol";
-        ammo = 6;
+        weaponName = "Rifle";
+        ammo = 20;
         maxAmmo = ammo;
-        fireRate = 0.15f;
+        fireRate = 0.1f;
     }
 
     public override void Shoot()
     {
-        if (ammo > 0)
+        if (ammo > 0 && Time.time >= nextFireTime)
         {
             nextFireTime = Time.time + fireRate;
             ammo--;
@@ -25,4 +25,5 @@ public class Pistol : WeaponBase
             GameObject bullet = Instantiate(bulletPrefab, spawnPosition, Quaternion.LookRotation(shootDirection));
         }
     }
+
 }

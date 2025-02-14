@@ -37,6 +37,7 @@ public class WeaponPickup : MonoBehaviour
     {
         PlayerController player = other.GetComponent<PlayerController>();
         if (player != null && weaponPrefab != null)
+
         {
             if (player.currentWeapon != null)
             {
