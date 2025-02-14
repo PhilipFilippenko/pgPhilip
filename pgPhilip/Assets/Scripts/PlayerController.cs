@@ -49,9 +49,22 @@ public class PlayerController : MonoBehaviour
 
     void HandleShooting()
     {
-        if (Input.GetMouseButtonDown(0) && currentWeapon != null)
+        if (currentWeapon != null)
         {
-            currentWeapon.Shoot();
+            if (currentWeapon is Rifle)
+            {
+                if (Input.GetMouseButton(0))
+                {
+                    currentWeapon.Shoot();
+                }
+            }
+            else if (currentWeapon is Pistol)
+            {
+                if (Input.GetMouseButtonDown(0))
+                {
+                    currentWeapon.Shoot();
+                }
+            }
         }
     }
 
@@ -64,7 +77,7 @@ public class PlayerController : MonoBehaviour
             Destroy(currentWeapon.gameObject);
         }
 
-        currentWeapon = Instantiate(newWeapon, weaponHolder.position, weaponHolder.rotation, weaponHolder);
+        currentWeapon = newWeapon;
     }
 
 }
