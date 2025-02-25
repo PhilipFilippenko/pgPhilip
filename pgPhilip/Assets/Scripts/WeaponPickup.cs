@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class WeaponPickup : MonoBehaviour
 {
-    public WeaponBase weaponPrefab;
+    public GameObject weaponPrefab;
     public float rotationSpeed = 50f;
     public float floatSpeed = 0.5f;
     public float floatHeight = 0.2f;
@@ -44,11 +44,18 @@ public class WeaponPickup : MonoBehaviour
                 Destroy(player.currentWeapon.gameObject);
             }
 
-            Debug.Log($"Picked up weapon: {weaponPrefab.weaponName}");
+            GameObject newWeaponGO = Instantiate(weaponPrefab, player.weaponHolder.position, player.weaponHolder.rotation);
+             WeaponBase newWeapon = newWeaponGO.GetComponent<WeaponBase>();
+            string name = "";
+            
+            if (newWeapon is Rifle)
+            {
+                name = (newWeapon as Rifle).weaponName;
+            }
 
-            WeaponBase newWeapon = Instantiate(weaponPrefab, player.weaponHolder.position, player.weaponHolder.rotation);
-            newWeapon.weaponName = weaponPrefab.weaponName;
-            newWeapon.transform.SetParent(player.weaponHolder);
+            Debug.Log("Picked up " + newWeaponGO.name);
+            //newWeapon.weaponName = weaponPrefab.weaponName;
+            newWeaponGO.transform.SetParent(player.weaponHolder);
             player.EquipWeapon(newWeapon);
 
             Destroy(gameObject);

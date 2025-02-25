@@ -15,11 +15,6 @@ public class Bullet : MonoBehaviour
         if (rb != null)
         {
             rb.velocity = transform.forward * speed;
-            Debug.Log($"Bullet fired with speed: {rb.velocity} (Expected Speed: {speed})");
-        }
-        else
-        {
-            Debug.LogError("Bullet has no Rigidbody!");
         }
 
         Destroy(gameObject, lifetime);
@@ -33,10 +28,6 @@ public class Bullet : MonoBehaviour
         {
             Debug.Log("Bullet hit an enemy!");
             enemy.TakeDamage();
-        }
-        else
-        {
-            Debug.Log($"Bullet hit {collision.gameObject.name}, but it has no IHealth.");
         }
 
         Destroy(gameObject);
