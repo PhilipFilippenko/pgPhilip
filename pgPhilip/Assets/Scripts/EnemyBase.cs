@@ -7,9 +7,17 @@ public abstract class EnemyBase : MonoBehaviour, IHealth
     public void TakeDamage()
     {
         health--;
+        Debug.Log($"Enemy took damage!");
+
         if (health <= 0)
         {
-            Destroy(gameObject);
+            Die();
         }
+    }
+
+    void Die()
+    {
+        Debug.Log("Enemy died!");
+        Destroy(gameObject);
     }
 }
