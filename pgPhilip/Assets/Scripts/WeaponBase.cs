@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class WeaponBase : MonoBehaviour, IWeapon
 {
-    public string weaponName;
+    internal string weaponName;
     public int ammo;
     public int maxAmmo;
     public float fireRate;
@@ -13,4 +13,9 @@ public abstract class WeaponBase : MonoBehaviour, IWeapon
     protected float nextFireTime = 0f;
 
     public abstract void Shoot();
+
+    internal void Start()
+    {
+        Debug.Log("Picked up " + weaponName);
+    }
 }
