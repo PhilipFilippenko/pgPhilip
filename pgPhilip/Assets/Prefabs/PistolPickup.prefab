@@ -68,7 +68,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2a95e40f184f194d979f32902d0d3b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponPrefab: {fileID: 3071349043379426444, guid: eb8249b741f9292409795a943de2417c, type: 3}
+  weaponPrefab: {fileID: 8857277035784525966, guid: eb8249b741f9292409795a943de2417c, type: 3}
   rotationSpeed: 50
   floatSpeed: 0.5
   floatHeight: 0.2

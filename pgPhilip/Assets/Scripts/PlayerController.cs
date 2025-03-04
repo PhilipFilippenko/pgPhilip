@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    float speed = 8f;
-    float rotationSpeed = 30f;
-    Vector3 movementDirection;
+    internal float speed = 8f;
+    internal float rotationSpeed = 30f;
+    internal Vector3 movementDirection;
     public WeaponBase currentWeapon;
     public Transform weaponHolder;
 
@@ -13,6 +13,10 @@ public class PlayerController : MonoBehaviour
         HandleMovement();
         RotateTowardsMouse();
         HandleShooting();
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            ThrowWeapon();
+        }
     }
 
     void HandleMovement()
@@ -51,22 +55,17 @@ public class PlayerController : MonoBehaviour
     {
         if (currentWeapon != null)
         {
-            if (currentWeapon is Rifle)
+            if (currentWeapon.weaponName == "Rifle" && Input.GetMouseButton(0))
             {
-                if (Input.GetMouseButton(0))
-                {
-                    currentWeapon.Shoot();
-                }
+                currentWeapon.Shoot();
             }
-            else if (currentWeapon is Pistol)
+            else if (currentWeapon.weaponName != "Rifle" && Input.GetMouseButtonDown(0))
             {
-                if (Input.GetMouseButtonDown(0))
-                {
-                    currentWeapon.Shoot();
-                }
+                currentWeapon.Shoot();
             }
         }
     }
+
 
     public void EquipWeapon(WeaponBase newWeapon)
     {
@@ -78,6 +77,31 @@ public class PlayerController : MonoBehaviour
         }
 
         currentWeapon = newWeapon;
+        currentWeapon.transform.SetParent(weaponHolder, false);
+        currentWeapon.transform.localPosition = Vector3.zero;
+        currentWeapon.transform.localRotation = Quaternion.identity;
+    }
+
+    public void ThrowWeapon()
+    {
+        Debug.Log("Throwing weapon");
+        if (currentWeapon == null) return;
+
+        Transform weaponTransform = currentWeapon.transform;
+
+        weaponTransform.SetParent(null);
+
+        Rigidbody rb = weaponTransform.GetComponent<Rigidbody>();
+        if (rb == null)
+        {
+            rb = weaponTransform.gameObject.AddComponent<Rigidbody>();
+        }
+
+        rb.isKinematic = false;
+        rb.AddForce(transform.forward * 1000f + Vector3.up * 200f);
+        rb.AddTorque(Random.insideUnitSphere * 300f);
+
+        currentWeapon = null;
     }
 
 }

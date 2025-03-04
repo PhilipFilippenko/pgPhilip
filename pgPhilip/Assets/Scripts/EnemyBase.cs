@@ -2,13 +2,17 @@ using UnityEngine;
 
 public abstract class EnemyBase : MonoBehaviour, IHealth
 {
-    public int health = 1;
+    internal int health = 1;
+    private ExitManager exitManager;
+
+    void Start()
+    {
+        exitManager = FindObjectOfType<ExitManager>();
+    }
 
     public void TakeDamage()
     {
         health--;
-        Debug.Log($"Enemy took damage!");
-
         if (health <= 0)
         {
             Die();
@@ -17,7 +21,7 @@ public abstract class EnemyBase : MonoBehaviour, IHealth
 
     void Die()
     {
-        Debug.Log("Enemy died!");
+        exitManager?.EnemyDefeated();
         Destroy(gameObject);
     }
 }

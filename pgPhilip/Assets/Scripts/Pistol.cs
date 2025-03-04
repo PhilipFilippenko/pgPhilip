@@ -10,21 +10,14 @@ public class Pistol : WeaponBase
         ammo = 6;
         maxAmmo = ammo;
         fireRate = 0.15f;
-        base.Start();
     }
 
     public override void Shoot()
     {
-        if (ammo > 0)
+        if (ammo > 0 && Time.time >= nextFireTime)
         {
             nextFireTime = Time.time + fireRate;
             ammo--;
-            Debug.Log($"Remaining bullets: {ammo}");
-
-            if (ammo <= 0)
-            {
-                Debug.Log("No ammo left!");
-            }
 
             Vector3 shootDirection = transform.root.forward;
             Vector3 spawnPosition = transform.root.position + shootDirection * bulletSpawnOffset;
