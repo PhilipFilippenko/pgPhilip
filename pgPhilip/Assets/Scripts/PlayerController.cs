@@ -28,7 +28,14 @@ public class PlayerController : MonoBehaviour
 
         if (movementDirection.magnitude > 0)
         {
-            transform.position += movementDirection * speed * Time.deltaTime;
+           Vector3 newPosition = transform.position +movementDirection * speed * Time.deltaTime;
+            if (Physics.CheckSphere(newPosition, 0.5f,3))
+            {
+                print("Ouch");
+
+            }
+            else
+                transform.position = newPosition;
         }
     }
 
@@ -80,6 +87,8 @@ public class PlayerController : MonoBehaviour
         currentWeapon.transform.SetParent(weaponHolder, false);
         currentWeapon.transform.localPosition = Vector3.zero;
         currentWeapon.transform.localRotation = Quaternion.identity;
+
+        newWeapon.DisableCollider();
     }
 
     public void ThrowWeapon()
@@ -96,12 +105,13 @@ public class PlayerController : MonoBehaviour
         {
             rb = weaponTransform.gameObject.AddComponent<Rigidbody>();
         }
-
+        currentWeapon.Thrown(rb);
         rb.isKinematic = false;
         rb.AddForce(transform.forward * 1000f + Vector3.up * 200f);
         rb.AddTorque(Random.insideUnitSphere * 300f);
 
+        currentWeapon.EnableCollider();
+
         currentWeapon = null;
     }
-
 }
