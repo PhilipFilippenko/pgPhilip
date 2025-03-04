@@ -6,9 +6,12 @@ public class WeaponPickup : MonoBehaviour
     internal float rotationSpeed = 50f;
     internal float floatSpeed = 0.5f;
     internal float floatHeight = 0.2f;
+    bool isUsed = false;
 
+    
     private Vector3 startPosition;
     private bool movingUp = true;
+    private int remainingAmmo;
 
     void Start()
     {
@@ -43,7 +46,11 @@ public class WeaponPickup : MonoBehaviour
 
         GameObject newWeaponGO = Instantiate(weaponPrefab, player.weaponHolder.position, player.weaponHolder.rotation);
         WeaponBase newWeapon = newWeaponGO.GetComponent<WeaponBase>();
+        if (isUsed)
+            newWeapon.ammo = remainingAmmo;
 
+        newWeapon.Iam(gameObject);
+       
         Debug.Log("Picked up " + newWeaponGO.name);
 
         newWeaponGO.transform.SetParent(player.weaponHolder);
@@ -51,4 +58,11 @@ public class WeaponPickup : MonoBehaviour
 
         Destroy(gameObject);
     }
+
+    internal void updateUsedStatus(int ammoLeft)
+    {
+        remainingAmmo = ammoLeft;
+        isUsed = true;
+    }
+
 }
