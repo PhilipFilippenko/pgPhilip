@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3125073755356498739}
   - component: {fileID: 3071349043379426444}
+  - component: {fileID: 3084466968833348219}
   m_Layer: 0
   m_Name: PistolPrefab
   m_TagString: Untagged
@@ -50,7 +51,29 @@ MonoBehaviour:
   maxAmmo: 0
   fireRate: 0
   bulletPrefab: {fileID: 3836168309207113132, guid: e73f9fd40939b5b4d94fa57da7b274ff, type: 3}
+  firePoint: {fileID: 0}
   bulletSpawnOffset: 1
+--- !u!65 &3084466968833348219
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8857277035784525966}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.1, y: 0.2, z: 0.3}
+  m_Center: {x: 0, y: -0.025468035, z: -0.02429533}
 --- !u!1001 &1034971058551524059
 PrefabInstance:
   m_ObjectHideFlags: 0
