@@ -8,14 +8,11 @@ public class PlayerController : MonoBehaviour
     public WeaponBase currentWeapon;
     public Transform weaponHolder;
     private CharacterController controller;
+    private WeaponPickup nearbyWeapon;
 
     void Start()
     {
         controller = GetComponent<CharacterController>();
-        if (controller == null)
-        {
-            controller = gameObject.AddComponent<CharacterController>();
-        }
     }
 
     void Update()
@@ -26,6 +23,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetMouseButtonDown(1))
         {
             ThrowWeapon();
+            EquipNearbyWeapon();
         }
     }
 
@@ -90,19 +88,39 @@ public class PlayerController : MonoBehaviour
         }
 
         currentWeapon = newWeapon;
-        currentWeapon.transform.SetParent(weaponHolder, false);
+        currentWeapon.transform.SetParent(weaponHolder);
         currentWeapon.transform.localPosition = Vector3.zero;
         currentWeapon.transform.localRotation = Quaternion.identity;
 
         newWeapon.DisableCollider();
     }
 
+    public void EquipNearbyWeapon()
+    {
+        if (nearbyWeapon == null) return;
+
+        GameObject newWeaponGO = Instantiate(nearbyWeapon.weaponPrefab, weaponHolder.position, weaponHolder.rotation);
+        WeaponBase newWeapon = newWeaponGO.GetComponent<WeaponBase>();
+
+        if (nearbyWeapon.isUsed)
+        {
+            newWeapon.ammo = nearbyWeapon.remainingAmmo;
+        }
+
+        newWeapon.SetPickupTemplate(nearbyWeapon.gameObject);
+        EquipWeapon(newWeapon);
+
+        Destroy(nearbyWeapon.gameObject);
+        nearbyWeapon = null;
+    }
+
+
     public void ThrowWeapon()
     {
         Debug.Log("Throwing weapon");
         if (currentWeapon == null) return;
 
-        Vector3 throwPosition = transform.position + transform.forward * 1.5f;
+        Vector3 throwPosition = transform.position + transform.forward * 2f;
 
         Transform weaponTransform = currentWeapon.transform;
 
@@ -125,4 +143,21 @@ public class PlayerController : MonoBehaviour
         currentWeapon = null;
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        WeaponPickup pickup = other.GetComponent<WeaponPickup>();
+        if (pickup != null)
+        {
+            nearbyWeapon = pickup;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        WeaponPickup pickup = other.GetComponent<WeaponPickup>();
+        if (pickup != null && pickup == nearbyWeapon)
+        {
+            nearbyWeapon = null;
+        }
+    }
 }

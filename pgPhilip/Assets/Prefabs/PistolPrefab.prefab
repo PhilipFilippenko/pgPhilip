@@ -51,7 +51,6 @@ MonoBehaviour:
   maxAmmo: 0
   fireRate: 0
   bulletPrefab: {fileID: 3836168309207113132, guid: e73f9fd40939b5b4d94fa57da7b274ff, type: 3}
-  weaponPickupPrefab: {fileID: 0}
   bulletSpawnOffset: 1
 --- !u!65 &3084466968833348219
 BoxCollider:
