@@ -28,8 +28,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1030599509120415121}
   m_Father: {fileID: 0}
@@ -51,7 +51,7 @@ MonoBehaviour:
   maxAmmo: 0
   fireRate: 0
   bulletPrefab: {fileID: 3836168309207113132, guid: e73f9fd40939b5b4d94fa57da7b274ff, type: 3}
-  firePoint: {fileID: 0}
+  weaponPickupPrefab: {fileID: 0}
   bulletSpawnOffset: 1
 --- !u!65 &3084466968833348219
 BoxCollider:
@@ -70,7 +70,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 0.1, y: 0.2, z: 0.3}
   m_Center: {x: 0, y: -0.025468035, z: -0.02429533}
