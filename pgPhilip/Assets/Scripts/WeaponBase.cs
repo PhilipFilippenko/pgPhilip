@@ -8,18 +8,18 @@ public abstract class WeaponBase : MonoBehaviour
     public int maxAmmo;
     public float fireRate;
     public GameObject bulletPrefab;
+    internal float throwDamage = 1f;
 
     protected float nextFireTime = 0f;
     private Collider weaponCollider;
-    private bool thrown = false;
+    private bool isThrown = false;
     private Rigidbody rb;
     private float timeSinceLastMovement = 0.1f;
     private float movementThreshold = 0.1f;
-    private GameObject pickUPCloneTemplate;
+    private GameObject pickupTemplate;
 
     void Awake()
     {
-
         weaponCollider = GetComponent<Collider>();
     }
 
@@ -35,22 +35,27 @@ public abstract class WeaponBase : MonoBehaviour
 
     private void Update()
     {
-        if (thrown)
+        if (isThrown)
         {
             if (rb.velocity.magnitude < movementThreshold)
             {
                 timeSinceLastMovement -= Time.deltaTime;
             }
-        }
 
-        if (timeSinceLastMovement < 0)
-            ChangeTOPickUP();
+            if (timeSinceLastMovement <= 0)
+            {
+                ConvertToPickup();
+            }
+        }
     }
 
-    private void ChangeTOPickUP()
+    private void ConvertToPickup()
     {
-        pickUPCloneTemplate.SetActive(true);
-        pickUPCloneTemplate.transform.position = transform.position;
+        if (pickupTemplate != null)
+        {
+            GameObject pickupInstance = Instantiate(pickupTemplate, transform.position, Quaternion.identity);
+            pickupInstance.SetActive(true);
+        }
         Destroy(gameObject);
     }
 
@@ -64,13 +69,29 @@ public abstract class WeaponBase : MonoBehaviour
 
     internal void Thrown(Rigidbody newRB)
     {
-        thrown = true;
+        isThrown = true;
         rb = newRB;
+        timeSinceLastMovement = 0.1f;
     }
 
-    internal void Iam(GameObject gameObject)
+    internal void SetPickupTemplate(GameObject template)
     {
-        pickUPCloneTemplate = Instantiate<GameObject>(gameObject);
-        pickUPCloneTemplate.SetActive(false);
+        pickupTemplate = Instantiate(template);
+        pickupTemplate.SetActive(false);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (!isThrown) return;
+
+        if (collision.gameObject.TryGetComponent<IHealth>(out IHealth enemy))
+        {
+            enemy.TakeDamage();
+
+            if (rb != null)
+            {
+                rb.velocity = new Vector3(0, rb.velocity.y, 0);
+            }
+        }
     }
 }
