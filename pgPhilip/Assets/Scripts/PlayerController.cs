@@ -7,13 +7,23 @@ public class PlayerController : MonoBehaviour
     internal Vector3 movementDirection;
     public WeaponBase currentWeapon;
     public Transform weaponHolder;
+    private CharacterController controller;
+
+    void Start()
+    {
+        controller = GetComponent<CharacterController>();
+        if (controller == null)
+        {
+            controller = gameObject.AddComponent<CharacterController>();
+        }
+    }
 
     void Update()
     {
         HandleMovement();
         RotateTowardsMouse();
         HandleShooting();
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetMouseButtonDown(1))
         {
             ThrowWeapon();
         }
@@ -26,16 +36,13 @@ public class PlayerController : MonoBehaviour
 
         movementDirection = new Vector3(moveX, 0, moveZ).normalized;
 
-        if (movementDirection.magnitude > 0)
+        if (movementDirection.magnitude > 0 && controller != null)
         {
-           Vector3 newPosition = transform.position +movementDirection * speed * Time.deltaTime;
-            if (Physics.CheckSphere(newPosition, 0.5f,3))
-            {
-                print("Ouch");
+            controller.Move(movementDirection * speed * Time.deltaTime);
 
-            }
-            else
-                transform.position = newPosition;
+            Vector3 fixedPosition = transform.position;
+            fixedPosition.y = 1;
+            transform.position = fixedPosition;
         }
     }
 
@@ -73,7 +80,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
     public void EquipWeapon(WeaponBase newWeapon)
     {
         if (newWeapon == null || weaponHolder == null) return;
@@ -96,22 +102,27 @@ public class PlayerController : MonoBehaviour
         Debug.Log("Throwing weapon");
         if (currentWeapon == null) return;
 
+        Vector3 throwPosition = transform.position + transform.forward * 1.5f;
+
         Transform weaponTransform = currentWeapon.transform;
 
         weaponTransform.SetParent(null);
+        weaponTransform.position = throwPosition;
 
         Rigidbody rb = weaponTransform.GetComponent<Rigidbody>();
         if (rb == null)
         {
             rb = weaponTransform.gameObject.AddComponent<Rigidbody>();
         }
+
+        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
         currentWeapon.Thrown(rb);
         rb.isKinematic = false;
         rb.AddForce(transform.forward * 1000f + Vector3.up * 200f);
         rb.AddTorque(Random.insideUnitSphere * 300f);
 
         currentWeapon.EnableCollider();
-
         currentWeapon = null;
     }
+
 }

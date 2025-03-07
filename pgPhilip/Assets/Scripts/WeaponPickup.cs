@@ -8,7 +8,7 @@ public class WeaponPickup : MonoBehaviour
     internal float floatHeight = 0.2f;
     bool isUsed = false;
 
-    
+
     private Vector3 startPosition;
     private bool movingUp = true;
     private int remainingAmmo;
@@ -50,7 +50,7 @@ public class WeaponPickup : MonoBehaviour
             newWeapon.ammo = remainingAmmo;
 
         newWeapon.Iam(gameObject);
-       
+
         Debug.Log("Picked up " + newWeaponGO.name);
 
         newWeaponGO.transform.SetParent(player.weaponHolder);

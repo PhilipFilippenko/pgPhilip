@@ -8,19 +8,18 @@ public abstract class WeaponBase : MonoBehaviour
     public int maxAmmo;
     public float fireRate;
     public GameObject bulletPrefab;
-   // public Transform firePoint;
 
     protected float nextFireTime = 0f;
     private Collider weaponCollider;
     private bool thrown = false;
     private Rigidbody rb;
-    private float timeSinceLastMovement = 1f;
+    private float timeSinceLastMovement = 0.1f;
     private float movementThreshold = 0.1f;
     private GameObject pickUPCloneTemplate;
 
     void Awake()
     {
-      
+
         weaponCollider = GetComponent<Collider>();
     }
 
@@ -71,7 +70,7 @@ public abstract class WeaponBase : MonoBehaviour
 
     internal void Iam(GameObject gameObject)
     {
-      pickUPCloneTemplate = Instantiate<GameObject>(gameObject);
+        pickUPCloneTemplate = Instantiate<GameObject>(gameObject);
         pickUPCloneTemplate.SetActive(false);
     }
 }
