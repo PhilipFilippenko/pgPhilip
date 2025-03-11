@@ -84,9 +84,15 @@ public abstract class WeaponBase : MonoBehaviour
     {
         if (!isThrown) return;
 
-        if (collision.gameObject.TryGetComponent<IHealth>(out IHealth enemy))
+        if (collision.gameObject.TryGetComponent<IHealth>(out IHealth entity))
         {
-            enemy.TakeDamage();
+            if (entity is PlayerController)
+            {
+                return;
+            }
+
+            entity.TakeDamage();
+            Debug.Log("Weapon hit an enemy!");
 
             if (rb != null)
             {

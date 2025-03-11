@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IHealth
 {
     internal float speed = 8f;
     internal float rotationSpeed = 30f;
@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
     public Transform weaponHolder;
     private CharacterController controller;
     private WeaponPickup nearbyWeapon;
+    internal int health = 1;
 
     void Start()
     {
@@ -114,11 +115,10 @@ public class PlayerController : MonoBehaviour
         nearbyWeapon = null;
     }
 
-
     public void ThrowWeapon()
     {
-        Debug.Log("Throwing weapon");
         if (currentWeapon == null) return;
+        Debug.Log("Throwing weapon");
 
         Vector3 throwPosition = transform.position + transform.forward * 2f;
 
@@ -159,5 +159,19 @@ public class PlayerController : MonoBehaviour
         {
             nearbyWeapon = null;
         }
+    }
+
+    public void TakeDamage()
+    {
+        health--;
+        if (health <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        gameObject.SetActive(false);
     }
 }

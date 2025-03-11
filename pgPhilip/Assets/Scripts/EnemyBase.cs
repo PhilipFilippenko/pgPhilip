@@ -11,7 +11,7 @@ public abstract class EnemyBase : MonoBehaviour, IHealth
     private float reactionTime;
     private float reactionCooldown = 0.2f;
     private float attackRange = 2f;
-    private float visionAngle = 90f;
+    private float visionAngle = Mathf.PI / 2.0f;
     private float visionDistance = 15f;
 
     private enum EnemyState
@@ -34,12 +34,7 @@ public abstract class EnemyBase : MonoBehaviour, IHealth
     void Update()
     {
         reactionTime -= Time.deltaTime;
-
-        if (reactionTime <= 0)
-        {
-            reactionTime = reactionCooldown;
-            UpdateState();
-        }
+        UpdateState();
     }
 
     private void UpdateState()
@@ -53,11 +48,11 @@ public abstract class EnemyBase : MonoBehaviour, IHealth
                 }
                 break;
             case EnemyState.Chase:
-                if (!CanSeePlayer())
-                {
-                    currentState = EnemyState.Idle;
-                }
-                else if (Vector3.Distance(transform.position, player.transform.position) < attackRange)
+                //if (!CanSeePlayer())
+                //{
+                //    currentState = EnemyState.Idle;
+                //}
+                if (Vector3.Distance(transform.position, player.transform.position) < attackRange)
                 {
                     currentState = EnemyState.Attack;
                 }
@@ -67,11 +62,11 @@ public abstract class EnemyBase : MonoBehaviour, IHealth
                 }
                 break;
             case EnemyState.Attack:
-                if (!CanSeePlayer())
-                {
-                    currentState = EnemyState.Idle;
-                }
-                else if (Vector3.Distance(transform.position, player.transform.position) > attackRange)
+                //if (!CanSeePlayer())
+                //{
+                //    currentState = EnemyState.Idle;
+                //}
+                if (Vector3.Distance(transform.position, player.transform.position) > attackRange)
                 {
                     currentState = EnemyState.Chase;
                 }
@@ -87,13 +82,13 @@ public abstract class EnemyBase : MonoBehaviour, IHealth
     {
         if (player == null) return false;
 
-        Vector3 directionToPlayer = (player.transform.position - transform.position).normalized;
-        float angle = Vector3.Angle(transform.forward, directionToPlayer);
+        Vector3 directionToPlayer = removeY(player.transform.position - transform.position);
 
-        if (angle < visionAngle / 2f)
+        float angle =Mathf.Acos( Vector3.Dot(removeY(transform.forward), directionToPlayer));
+        if (angle < (visionAngle / 2f))
         {
             RaycastHit hit;
-            if (Physics.Raycast(transform.position + Vector3.up, directionToPlayer, out hit, visionDistance))
+            if (Physics.Raycast(transform.position , directionToPlayer, out hit, visionDistance))
             {
                 if (hit.collider.CompareTag("Player"))
                 {
@@ -103,10 +98,15 @@ public abstract class EnemyBase : MonoBehaviour, IHealth
         }
         return false;
     }
+    
+    Vector3 removeY(Vector3 v)
+    {
+        return (new Vector3(v.x, 0, v.z)).normalized;
+    }
 
     private void AttackPlayer()
     {
-        Debug.Log("Enemy Attacking!");
+        player.TakeDamage();
     }
 
     public void TakeDamage()

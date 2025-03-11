@@ -7,9 +7,9 @@ public class Rifle : WeaponBase
     void Start()
     {
         weaponName = "Rifle";
-        ammo = 20;
+        ammo = 24;
         maxAmmo = ammo;
-        fireRate = 0.1f;
+        fireRate = 0.05f;
     }
 
     public override void Shoot()
@@ -18,6 +18,7 @@ public class Rifle : WeaponBase
         {
             nextFireTime = Time.time + fireRate;
             ammo--;
+            print("Ammo left: " + ammo);
 
             Vector3 shootDirection = transform.root.forward;
             Vector3 spawnPosition = transform.root.position + shootDirection * bulletSpawnOffset;
