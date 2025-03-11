@@ -1,27 +1,112 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public abstract class EnemyBase : MonoBehaviour, IHealth
 {
     internal int health = 1;
     private ExitManager exitManager;
-    PlayerController player;
-    private Vector3 destination;
-  
-    float enemyReactionTIme = 0;
-    private float enemyReactionTimeCooldown = 0.5f;
-    enum EnemyState
+    private PlayerController player;
+    private NavMeshAgent agent;
+
+    private float reactionTime;
+    private float reactionCooldown = 0.2f;
+    private float attackRange = 2f;
+    private float visionAngle = 90f;
+    private float visionDistance = 15f;
+
+    private enum EnemyState
     {
         Idle,
         Chase,
         Attack
     }
 
-    EnemyState currentStat = EnemyState.Idle;
+    private EnemyState currentState = EnemyState.Idle;
+
     void Start()
     {
         player = FindObjectOfType<PlayerController>();
         exitManager = FindObjectOfType<ExitManager>();
-        destination = transform.position;
+        agent = GetComponent<NavMeshAgent>();
+        reactionTime = reactionCooldown;
+    }
+
+    void Update()
+    {
+        reactionTime -= Time.deltaTime;
+
+        if (reactionTime <= 0)
+        {
+            reactionTime = reactionCooldown;
+            UpdateState();
+        }
+    }
+
+    private void UpdateState()
+    {
+        switch (currentState)
+        {
+            case EnemyState.Idle:
+                if (CanSeePlayer())
+                {
+                    currentState = EnemyState.Chase;
+                }
+                break;
+            case EnemyState.Chase:
+                if (!CanSeePlayer())
+                {
+                    currentState = EnemyState.Idle;
+                }
+                else if (Vector3.Distance(transform.position, player.transform.position) < attackRange)
+                {
+                    currentState = EnemyState.Attack;
+                }
+                else
+                {
+                    agent.SetDestination(player.transform.position);
+                }
+                break;
+            case EnemyState.Attack:
+                if (!CanSeePlayer())
+                {
+                    currentState = EnemyState.Idle;
+                }
+                else if (Vector3.Distance(transform.position, player.transform.position) > attackRange)
+                {
+                    currentState = EnemyState.Chase;
+                }
+                else
+                {
+                    AttackPlayer();
+                }
+                break;
+        }
+    }
+
+    private bool CanSeePlayer()
+    {
+        if (player == null) return false;
+
+        Vector3 directionToPlayer = (player.transform.position - transform.position).normalized;
+        float angle = Vector3.Angle(transform.forward, directionToPlayer);
+
+        if (angle < visionAngle / 2f)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position + Vector3.up, directionToPlayer, out hit, visionDistance))
+            {
+                if (hit.collider.CompareTag("Player"))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void AttackPlayer()
+    {
+        Debug.Log("Enemy Attacking!");
     }
 
     public void TakeDamage()
@@ -31,87 +116,6 @@ public abstract class EnemyBase : MonoBehaviour, IHealth
         {
             Die();
         }
-    }
-
-
-
-    bool canSeePlayer()
-    {
-
-        // Check if the player is in line of sight
-
-        // check if the player in visible cone
-
-        // find the angle between the enemy forward vector and the vector pointing to the player
-
-        float angle = Vector3.Angle(transform.forward, player.transform.position - transform.position) ;
-
-        if (Mathf.Abs( angle)  < 45)
-        {
-            // in the cone of vision
-
-            RaycastHit hit;
-            if (Physics.Raycast(transform.position, (player.transform.position - transform.position).normalized, out hit))
-            {
-                if (hit.collider.CompareTag("Player"))
-                {
-                    return true;
-                }
-            }
-          
-
-        }
-        return false;
-
-    }
-
-
-    private void Update()
-    {
-
-        switch(currentStat)
-        {
-            case EnemyState.Idle:
-                if (canSeePlayer())
-                {
-                    currentStat = EnemyState.Chase;
-                }
-                break;
-            case EnemyState.Chase:
-                if (!canSeePlayer())
-                {
-                    currentStat = EnemyState.Idle;
-                }
-                break;
-            case EnemyState.Attack:
-                break;
-        }
-
-
-
-
-        enemyReactionTIme -= Time.deltaTime;
-        if (enemyReactionTIme <= 0)
-        {
-            enemyReactionTIme = enemyReactionTimeCooldown; ;
-            if (canSeePlayer())
-            {
-                destination = player.transform.position;
-            }
-
-            // navMeshAgent.destination = destination;
-        }
-
-        if (Vector3.Distance(transform.position, destination) > 0.1f)
-        {
-            
-            Vector3 forward = new Vector3(transform.forward.x, 0, transform.forward.z).normalized;
-            transform.forward = forward;
-            transform.position += forward * Time.deltaTime;
-        }
-  
-
-
     }
 
     void Die()
