@@ -1,26 +1,29 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 
 public abstract class EnemyBase : MonoBehaviour, IHealth
 {
-    internal int health = 1;
+    private int health = 1;
+    private float attackRange = 2f;
+    private float visionAngle = 1.5f * Mathf.PI;
+    private float memoryTime = 1f;
+    private float accelerationTime = 0.2f;
+    private float maxSpeed = 9f;
+    private float rotationSpeed = 15f;
+
     private ExitManager exitManager;
     private PlayerController player;
     private NavMeshAgent agent;
 
+    private Vector3 lastSeenPosition;
+    private bool playerVisible;
+    private float timeSinceLastSeen = 0f;
     private float reactionTime;
     private float reactionCooldown = 0.2f;
-    private float attackRange = 2f;
-    private float visionAngle = Mathf.PI / 2.0f;
-    private float visionDistance = 15f;
 
-    private enum EnemyState
-    {
-        Idle,
-        Chase,
-        Attack
-    }
+    private WeaponBase currentWeapon;
 
+    private enum EnemyState { Idle, Chase, Attack }
     private EnemyState currentState = EnemyState.Idle;
 
     void Start()
@@ -28,6 +31,10 @@ public abstract class EnemyBase : MonoBehaviour, IHealth
         player = FindObjectOfType<PlayerController>();
         exitManager = FindObjectOfType<ExitManager>();
         agent = GetComponent<NavMeshAgent>();
+
+        agent.updateRotation = false;
+        agent.acceleration = maxSpeed / accelerationTime;
+
         reactionTime = reactionCooldown;
     }
 
@@ -39,42 +46,75 @@ public abstract class EnemyBase : MonoBehaviour, IHealth
 
     private void UpdateState()
     {
+        playerVisible = CanSeePlayer();
+
+        if (playerVisible)
+        {
+            lastSeenPosition = player.transform.position;
+            timeSinceLastSeen = 0f;
+        }
+        else
+        {
+            timeSinceLastSeen += Time.deltaTime;
+        }
+
         switch (currentState)
         {
             case EnemyState.Idle:
-                if (CanSeePlayer())
-                {
-                    currentState = EnemyState.Chase;
-                }
+                agent.speed = 2f;
+                if (playerVisible) SetState(EnemyState.Chase);
                 break;
             case EnemyState.Chase:
-                //if (!CanSeePlayer())
-                //{
-                //    currentState = EnemyState.Idle;
-                //}
-                if (Vector3.Distance(transform.position, player.transform.position) < attackRange)
+                agent.speed = maxSpeed;
+                if (!playerVisible && timeSinceLastSeen > memoryTime)
                 {
-                    currentState = EnemyState.Attack;
+                    SetState(EnemyState.Idle);
                 }
                 else
                 {
-                    agent.SetDestination(player.transform.position);
+                    agent.SetDestination(lastSeenPosition);
+                    SmoothRotateTo(lastSeenPosition);
+
+                    if ((transform.position - player.transform.position).sqrMagnitude < attackRange * attackRange)
+                    {
+                        SetState(EnemyState.Attack);
+                    }
                 }
                 break;
             case EnemyState.Attack:
-                //if (!CanSeePlayer())
-                //{
-                //    currentState = EnemyState.Idle;
-                //}
-                if (Vector3.Distance(transform.position, player.transform.position) > attackRange)
+                agent.speed = 0f;
+
+                if (!playerVisible && timeSinceLastSeen > memoryTime)
                 {
-                    currentState = EnemyState.Chase;
+                    SetState(EnemyState.Idle);
+                }
+                else if ((transform.position - player.transform.position).sqrMagnitude > attackRange * attackRange) // ❌ Исправлено
+                {
+                    SetState(EnemyState.Chase);
                 }
                 else
                 {
-                    AttackPlayer();
+                    if (currentWeapon is WeaponMelee meleeWeapon)
+                    {
+                        meleeWeapon.Attack();
+                    }
                 }
                 break;
+        }
+    }
+
+    private void SetState(EnemyState newState)
+    {
+        currentState = newState;
+    }
+
+    private void SmoothRotateTo(Vector3 targetPosition)
+    {
+        Vector3 direction = (targetPosition - transform.position).normalized;
+        if (direction.sqrMagnitude > 0.01f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         }
     }
 
@@ -83,44 +123,40 @@ public abstract class EnemyBase : MonoBehaviour, IHealth
         if (player == null) return false;
 
         Vector3 directionToPlayer = removeY(player.transform.position - transform.position);
+        float angle = Mathf.Acos(Vector3.Dot(removeY(transform.forward), directionToPlayer));
 
-        float angle =Mathf.Acos( Vector3.Dot(removeY(transform.forward), directionToPlayer));
         if (angle < (visionAngle / 2f))
         {
-            RaycastHit hit;
-            if (Physics.Raycast(transform.position , directionToPlayer, out hit, visionDistance))
+            if (Physics.Raycast(transform.position, directionToPlayer, out RaycastHit hit))
             {
-                if (hit.collider.CompareTag("Player"))
-                {
-                    return true;
-                }
+                return hit.collider.CompareTag("Player");
             }
         }
         return false;
     }
-    
-    Vector3 removeY(Vector3 v)
-    {
-        return (new Vector3(v.x, 0, v.z)).normalized;
-    }
 
-    private void AttackPlayer()
+    private Vector3 removeY(Vector3 v)
     {
-        player.TakeDamage();
+        return new Vector3(v.x, 0, v.z).normalized;
     }
 
     public void TakeDamage()
     {
         health--;
-        if (health <= 0)
-        {
-            Die();
-        }
+        if (health <= 0) Die();
     }
 
-    void Die()
+    private void Die()
     {
+        OnDeath();
         exitManager?.EnemyDefeated();
         Destroy(gameObject);
+    }
+
+    protected virtual void OnDeath() { }
+
+    public void EquipWeapon(WeaponBase weapon)
+    {
+        currentWeapon = weapon;
     }
 }
