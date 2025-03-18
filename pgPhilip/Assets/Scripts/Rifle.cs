@@ -26,4 +26,6 @@ public class Rifle : WeaponBase
             GameObject bullet = Instantiate(bulletPrefab, spawnPosition, Quaternion.LookRotation(shootDirection));
         }
     }
+
+    public override void Attack() { }
 }

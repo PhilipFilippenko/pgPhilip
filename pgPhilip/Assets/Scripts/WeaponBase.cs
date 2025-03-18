@@ -24,6 +24,7 @@ public abstract class WeaponBase : MonoBehaviour
     }
 
     public abstract void Shoot();
+    public abstract void Attack();
 
     public void DisableCollider()
     {
