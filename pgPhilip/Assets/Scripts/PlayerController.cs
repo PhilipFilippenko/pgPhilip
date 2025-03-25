@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour, IHealth
     }
 
     void Update()
-    {
+    {  
         HandleMovement();
         RotateTowardsMouse();
         HandleShooting();
@@ -81,21 +81,21 @@ public class PlayerController : MonoBehaviour, IHealth
         {
             if (Input.GetMouseButton(0))
             {
-                currentWeapon.Shoot();
-                animator.SetBool("isShooting", true);
-            }
-
-            if (Input.GetMouseButtonUp(0))
-            {
-                animator.SetBool("isShooting", false);
+                if (currentWeapon.Shoot())
+                {
+                    animator.Play("demo_combat_shoot", 0, 0f);
+                }
             }
         }
-        else
+
+        if (currentWeapon.weaponName == "Pistol")
         {
             if (Input.GetMouseButtonDown(0))
             {
-                currentWeapon.Shoot();
-                animator.SetTrigger("shootTrigger");
+                if (currentWeapon.Shoot())
+                {
+                    animator.Play("demo_combat_shoot", 0, 0f);
+                }
             }
         }
     }
@@ -119,16 +119,6 @@ public class PlayerController : MonoBehaviour, IHealth
         newWeapon.transform.localRotation = Quaternion.Inverse(grip.localRotation);
 
         newWeapon.DisableCollider();
-
-        if (currentWeapon.weaponName == "Rifle")
-        {
-            animator.SetFloat("shootSpeed", 2f);
-        }
-
-        else if (currentWeapon.weaponName == "Pistol")
-        {
-            animator.SetFloat("shootSpeed", 2f);
-        }
     }
 
     public void EquipNearbyWeapon()

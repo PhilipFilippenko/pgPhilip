@@ -23,7 +23,7 @@ public abstract class WeaponBase : MonoBehaviour
         weaponCollider = GetComponent<Collider>();
     }
 
-    public abstract void Shoot();
+    public abstract bool Shoot();
     public abstract void Attack();
 
     public void DisableCollider()
