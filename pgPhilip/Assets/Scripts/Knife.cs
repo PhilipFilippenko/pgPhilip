@@ -10,9 +10,9 @@ public class Knife : WeaponBase
         fireRate = 0f;
     }
 
-    public override void Shoot()
+    public override bool Shoot()
     {
-        // Knife NO NO shoot
+        return false;
     }
 
     public override void Attack()

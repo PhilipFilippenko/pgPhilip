@@ -12,7 +12,7 @@ public class Pistol : WeaponBase
         fireRate = 0.15f;
     }
 
-    public override void Shoot()
+    public override bool Shoot()
     {
         if (ammo > 0 && Time.time >= nextFireTime)
         {
@@ -23,7 +23,9 @@ public class Pistol : WeaponBase
             Vector3 spawnPosition = transform.root.position + shootDirection * bulletSpawnOffset;
 
             GameObject bullet = Instantiate(bulletPrefab, spawnPosition, Quaternion.LookRotation(shootDirection));
+            return true;
         }
+        return false;
     }
 
     public override void Attack() { }

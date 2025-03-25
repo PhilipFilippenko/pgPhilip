@@ -21,5 +21,8 @@ public class WeaponMelee : WeaponBase
         }
     }
 
-    public override void Shoot() { }
+    public override bool Shoot()
+    {
+        return false;
+    }
 }

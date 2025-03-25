@@ -10,9 +10,10 @@ public class Rifle : WeaponBase
         ammo = 24;
         maxAmmo = ammo;
         fireRate = 0.05f;
+
     }
 
-    public override void Shoot()
+    public override bool Shoot()
     {
         if (ammo > 0 && Time.time >= nextFireTime)
         {
@@ -24,7 +25,9 @@ public class Rifle : WeaponBase
             Vector3 spawnPosition = transform.root.position + shootDirection * bulletSpawnOffset;
 
             GameObject bullet = Instantiate(bulletPrefab, spawnPosition, Quaternion.LookRotation(shootDirection));
+            return true;
         }
+        return false;
     }
 
     public override void Attack() { }
