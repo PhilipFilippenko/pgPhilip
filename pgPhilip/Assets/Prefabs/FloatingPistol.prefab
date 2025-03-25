@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6593141436206663965}
   - component: {fileID: -8339229923417103207}
   m_Layer: 0
-  m_Name: PistolPickup
+  m_Name: FloatingPistol
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27,11 +27,11 @@ Transform:
   m_GameObject: {fileID: 4110304631776508063}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.81, y: 1.1057235, z: -5.2220674}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_ConstrainProportionsScale: 1
   m_Children:
-  - {fileID: 2246504244026554218}
+  - {fileID: 3023569763156974494}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6593141436206663965
@@ -47,6 +47,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponPrefab: {fileID: 8857277035784525966, guid: eb8249b741f9292409795a943de2417c, type: 3}
+  isUsed: 0
+  remainingAmmo: 0
 --- !u!65 &-8339229923417103207
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -66,9 +68,9 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 0.7, y: 0.7, z: 0.7}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!1001 &3779454332801891417
+--- !u!1001 &192421870572589229
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -76,18 +78,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4675679412355678193}
     m_Modifications:
-    - target: {fileID: 3125073755356498739, guid: eb8249b741f9292409795a943de2417c, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 3125073755356498739, guid: eb8249b741f9292409795a943de2417c, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 3125073755356498739, guid: eb8249b741f9292409795a943de2417c, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 4
-      objectReference: {fileID: 0}
     - target: {fileID: 3125073755356498739, guid: eb8249b741f9292409795a943de2417c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -128,24 +118,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3125073755356498739, guid: eb8249b741f9292409795a943de2417c, type: 3}
-      propertyPath: m_ConstrainProportionsScale
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 8857277035784525966, guid: eb8249b741f9292409795a943de2417c, type: 3}
       propertyPath: m_Name
-      value: PistolPrefab
+      value: Pistol
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 5536224878055670541, guid: eb8249b741f9292409795a943de2417c, type: 3}
-    - {fileID: 2145582558803661152, guid: eb8249b741f9292409795a943de2417c, type: 3}
-    - {fileID: 3071349043379426444, guid: eb8249b741f9292409795a943de2417c, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: eb8249b741f9292409795a943de2417c, type: 3}
---- !u!4 &2246504244026554218 stripped
+--- !u!4 &3023569763156974494 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3125073755356498739, guid: eb8249b741f9292409795a943de2417c, type: 3}
-  m_PrefabInstance: {fileID: 3779454332801891417}
+  m_PrefabInstance: {fileID: 192421870572589229}
   m_PrefabAsset: {fileID: 0}

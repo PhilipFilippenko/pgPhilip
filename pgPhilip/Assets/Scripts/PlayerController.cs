@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour, IHealth
 {
+    internal int health = 1;
     internal float speed = 8f;
     internal float rotationSpeed = 30f;
     internal Vector3 movementDirection;
@@ -9,11 +10,13 @@ public class PlayerController : MonoBehaviour, IHealth
     public Transform weaponHolder;
     private CharacterController controller;
     private WeaponPickup nearbyWeapon;
-    internal int health = 1;
+    private Animator animator;
 
     void Start()
     {
+        animator = GetComponentInChildren<Animator>();
         controller = GetComponent<CharacterController>();
+        HideWeaponMaterial();
     }
 
     void Update()
@@ -37,12 +40,18 @@ public class PlayerController : MonoBehaviour, IHealth
 
         if (movementDirection.magnitude > 0 && controller != null)
         {
+            animator.SetBool("isRunning", true);
             controller.Move(movementDirection * speed * Time.deltaTime);
 
             Vector3 fixedPosition = transform.position;
             fixedPosition.y = 1;
             transform.position = fixedPosition;
         }
+        else
+        {
+            animator.SetBool("isRunning", false);
+        }
+
     }
 
     void RotateTowardsMouse()
@@ -66,22 +75,35 @@ public class PlayerController : MonoBehaviour, IHealth
 
     void HandleShooting()
     {
-        if (currentWeapon != null)
+        if (currentWeapon == null) return;
+
+        if (currentWeapon.weaponName == "Rifle")
         {
-            if (currentWeapon.weaponName == "Rifle" && Input.GetMouseButton(0))
+            if (Input.GetMouseButton(0))
             {
                 currentWeapon.Shoot();
+                animator.SetBool("isShooting", true);
             }
-            else if (currentWeapon.weaponName != "Rifle" && Input.GetMouseButtonDown(0))
+
+            if (Input.GetMouseButtonUp(0))
+            {
+                animator.SetBool("isShooting", false);
+            }
+        }
+        else
+        {
+            if (Input.GetMouseButtonDown(0))
             {
                 currentWeapon.Shoot();
+                animator.SetTrigger("shootTrigger");
             }
         }
     }
 
+
     public void EquipWeapon(WeaponBase newWeapon)
     {
-        if (newWeapon == null || weaponHolder == null) return;
+        if (newWeapon == null) return;
 
         if (currentWeapon != null)
         {
@@ -89,11 +111,24 @@ public class PlayerController : MonoBehaviour, IHealth
         }
 
         currentWeapon = newWeapon;
-        currentWeapon.transform.SetParent(weaponHolder);
-        currentWeapon.transform.localPosition = Vector3.zero;
-        currentWeapon.transform.localRotation = Quaternion.identity;
+
+        Transform grip = newWeapon.transform.Find("GripPoint");
+
+        newWeapon.transform.SetParent(weaponHolder, false);
+        newWeapon.transform.localPosition = -grip.localPosition;
+        newWeapon.transform.localRotation = Quaternion.Inverse(grip.localRotation);
 
         newWeapon.DisableCollider();
+
+        if (currentWeapon.weaponName == "Rifle")
+        {
+            animator.SetFloat("shootSpeed", 2f);
+        }
+
+        else if (currentWeapon.weaponName == "Pistol")
+        {
+            animator.SetFloat("shootSpeed", 2f);
+        }
     }
 
     public void EquipNearbyWeapon()
@@ -173,5 +208,24 @@ public class PlayerController : MonoBehaviour, IHealth
     private void Die()
     {
         gameObject.SetActive(false);
+    }
+
+    void HideWeaponMaterial()
+    {
+        SkinnedMeshRenderer renderer = GetComponentInChildren<SkinnedMeshRenderer>();
+        if (renderer == null) return;
+
+        Material[] materials = renderer.materials;
+
+        for (int i = 0; i < materials.Length; i++)
+        {
+            if (materials[i].name.ToLower().Contains("weapon"))
+            {
+                materials[i].color = new Color(1, 1, 1, 0);
+                materials[i].shader = Shader.Find("Legacy Shaders/Transparent/Diffuse");
+            }
+        }
+
+        renderer.materials = materials;
     }
 }
