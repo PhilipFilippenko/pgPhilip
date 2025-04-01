@@ -77,6 +77,14 @@ public class PlayerController : MonoBehaviour, IHealth
     {
         if (currentWeapon == null) return;
 
+        if (currentWeapon.weaponName == "Knife")
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                currentWeapon.Attack();
+            }
+        }
+
         if (currentWeapon.weaponName == "Rifle")
         {
             if (Input.GetMouseButton(0))

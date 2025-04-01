@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public abstract class WeaponBase : MonoBehaviour
@@ -7,6 +6,7 @@ public abstract class WeaponBase : MonoBehaviour
     public int ammo;
     public int maxAmmo;
     public float fireRate;
+    public float attackRange = 1.5f;
     public GameObject bulletPrefab;
     internal float throwDamage = 1f;
 
@@ -23,8 +23,15 @@ public abstract class WeaponBase : MonoBehaviour
         weaponCollider = GetComponent<Collider>();
     }
 
-    public abstract bool Shoot();
-    public abstract void Attack();
+    public virtual bool Shoot()
+    {
+        return false;
+    }
+
+    public virtual bool Attack() 
+    {
+        return false;
+    }
 
     public void DisableCollider()
     {
@@ -34,19 +41,15 @@ public abstract class WeaponBase : MonoBehaviour
         }
     }
 
-    private void Update()
+    void Update()
     {
-        if (isThrown)
+        if (isThrown && rb != null)
         {
             if (rb.velocity.magnitude < movementThreshold)
-            {
                 timeSinceLastMovement -= Time.deltaTime;
-            }
 
             if (timeSinceLastMovement <= 0)
-            {
                 ConvertToPickup();
-            }
         }
     }
 
@@ -87,18 +90,49 @@ public abstract class WeaponBase : MonoBehaviour
 
         if (collision.gameObject.TryGetComponent<IHealth>(out IHealth entity))
         {
-            if (entity is PlayerController)
+            if (!(entity is PlayerController))
             {
-                return;
+                entity.TakeDamage();
+                Debug.Log("Weapon hit an enemy!");
             }
 
-            entity.TakeDamage();
-            Debug.Log("Weapon hit an enemy!");
-
             if (rb != null)
-            {
                 rb.velocity = new Vector3(0, rb.velocity.y, 0);
+        }
+    }
+
+    protected bool TryShoot(Vector3 shootDirection)
+    {
+        if (ammo > 0 && Time.time >= nextFireTime)
+        {
+            nextFireTime = Time.time + fireRate;
+            ammo--;
+
+            Vector3 spawnPosition = transform.root.position + shootDirection;
+            Instantiate(bulletPrefab, spawnPosition, Quaternion.LookRotation(shootDirection));
+            return true;
+        }
+        return false;
+    }
+
+    protected void TryAttack(IHealth target)
+    {
+        if (target == null) return;
+
+        if (target is Component targetComponent)
+        {
+            float dist = (targetComponent.transform.position - transform.position).sqrMagnitude;
+            if (dist <= attackRange * attackRange)
+            {
+                target.TakeDamage();
             }
         }
     }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
+    }
+
 }

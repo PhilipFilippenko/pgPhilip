@@ -8,25 +8,30 @@ public class Knife : WeaponBase
         ammo = 0;
         maxAmmo = 0;
         fireRate = 0f;
+        attackRange = 1.7f;
     }
 
-    public override bool Shoot()
+    public override bool Attack()
     {
-        return false;
-    }
-
-    public override void Attack()
-    {
-        GameObject playerObj = GameObject.FindWithTag("Player");
-        if (playerObj == null) return;
-
-        float distance = (transform.position - playerObj.transform.position).sqrMagnitude;
-        if (distance < 4f)
+        if (transform.root.TryGetComponent<PlayerController>(out var player))
         {
-            if (playerObj.TryGetComponent<IHealth>(out IHealth health))
+            GameObject obj = GameObject.FindWithTag("Enemy");
+            if (obj && obj.TryGetComponent<IHealth>(out var enemy))
             {
-                health.TakeDamage();
+                TryAttack(enemy);
+                return true;
             }
         }
+        else if (transform.root.TryGetComponent<EnemyBase>(out var enemy))
+        {
+            GameObject obj = GameObject.FindWithTag("Player");
+            if (obj && obj.TryGetComponent<IHealth>(out var playerTarget))
+            {
+                TryAttack(playerTarget);
+                return true;
+            }
+        }
+
+        return false;
     }
 }

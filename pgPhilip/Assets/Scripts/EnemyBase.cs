@@ -88,16 +88,13 @@ public abstract class EnemyBase : MonoBehaviour, IHealth
                 {
                     SetState(EnemyState.Idle);
                 }
-                else if ((transform.position - player.transform.position).sqrMagnitude > attackRange * attackRange) // ❌ Исправлено
+                else if ((transform.position - player.transform.position).sqrMagnitude > attackRange * attackRange)
                 {
                     SetState(EnemyState.Chase);
                 }
                 else
                 {
-                    if (currentWeapon is WeaponMelee meleeWeapon)
-                    {
-                        meleeWeapon.Attack();
-                    }
+                    currentWeapon?.Attack();
                 }
                 break;
         }

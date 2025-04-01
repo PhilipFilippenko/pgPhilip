@@ -14,19 +14,7 @@ public class Pistol : WeaponBase
 
     public override bool Shoot()
     {
-        if (ammo > 0 && Time.time >= nextFireTime)
-        {
-            nextFireTime = Time.time + fireRate;
-            ammo--;
-
-            Vector3 shootDirection = transform.root.forward;
-            Vector3 spawnPosition = transform.root.position + shootDirection * bulletSpawnOffset;
-
-            GameObject bullet = Instantiate(bulletPrefab, spawnPosition, Quaternion.LookRotation(shootDirection));
-            return true;
-        }
-        return false;
+        Vector3 shootDirection = transform.root.forward * bulletSpawnOffset;
+        return TryShoot(shootDirection);
     }
-
-    public override void Attack() { }
 }
