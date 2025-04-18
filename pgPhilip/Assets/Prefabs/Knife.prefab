@@ -9,8 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7408012014151994187}
-  - component: {fileID: 590742530028577546}
   - component: {fileID: 6903903735602054736}
+  - component: {fileID: 759828898219178371}
   m_Layer: 0
   m_Name: Knife
   m_TagString: Untagged
@@ -35,24 +35,6 @@ Transform:
   - {fileID: 7767264100705432480}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: -90}
---- !u!114 &590742530028577546
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2254667879243526999}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f7ee7ea79d4676042b105f5dbcb1fe57, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  weaponName: 
-  ammo: 0
-  maxAmmo: 0
-  fireRate: 0
-  attackRange: 1.5
-  bulletPrefab: {fileID: 0}
 --- !u!65 &6903903735602054736
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -74,6 +56,25 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.13, y: 0.1, z: 0.3}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &759828898219178371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2254667879243526999}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7ee7ea79d4676042b105f5dbcb1fe57, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponName: 
+  ammo: 0
+  maxAmmo: 0
+  fireRate: 0
+  attackRange: 1.5
+  isMelee: 0
+  bulletPrefab: {fileID: 0}
 --- !u!1 &6280989795923955569
 GameObject:
   m_ObjectHideFlags: 0
