@@ -9,8 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7844333031901648825}
-  - component: {fileID: 3899909942299474827}
   - component: {fileID: 51474664418158097}
+  - component: {fileID: 3899909942299474827}
   m_Layer: 0
   m_Name: Floating Rifle
   m_TagString: Untagged
@@ -34,6 +34,21 @@ Transform:
   - {fileID: 6040381028308893990}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &51474664418158097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6246239359521432475}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2a95e40f184f194d979f32902d0d3b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponPrefab: {fileID: 1314274499441548170, guid: bbf07331c9062ee44a25506f09b546e6, type: 3}
+  isUsed: 0
+  remainingAmmo: 0
 --- !u!65 &3899909942299474827
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -55,21 +70,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &51474664418158097
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6246239359521432475}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f2a95e40f184f194d979f32902d0d3b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  weaponPrefab: {fileID: 1314274499441548170, guid: bbf07331c9062ee44a25506f09b546e6, type: 3}
-  isUsed: 0
-  remainingAmmo: 0
 --- !u!1001 &8314809457296600360
 PrefabInstance:
   m_ObjectHideFlags: 0
