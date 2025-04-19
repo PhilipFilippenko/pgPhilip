@@ -244,6 +244,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponPrefab: {fileID: 2254667879243526999, guid: 7f030640f43efb947a6f2b188cd1f93a, type: 3}
+  pickupPrefab: {fileID: 4915891902541329339}
   isUsed: 0
   remainingAmmo: 0
 --- !u!65 &6992405825979237596
@@ -318,7 +319,10 @@ MonoBehaviour:
   ammo: 0
   maxAmmo: 0
   fireRate: 0
+  attackRange: 1.5
+  isMelee: 0
   bulletPrefab: {fileID: 0}
+  pickupTemplate: {fileID: 0}
 --- !u!65 &3084534746663001168
 BoxCollider:
   m_ObjectHideFlags: 0

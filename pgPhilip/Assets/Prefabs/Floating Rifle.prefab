@@ -47,6 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponPrefab: {fileID: 1314274499441548170, guid: bbf07331c9062ee44a25506f09b546e6, type: 3}
+  pickupPrefab: {fileID: 6246239359521432475}
   isUsed: 0
   remainingAmmo: 0
 --- !u!65 &3899909942299474827

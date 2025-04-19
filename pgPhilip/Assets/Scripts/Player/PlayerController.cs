@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour, IHealth
     internal Vector3 movementDirection;
 
     private float meleeAttackCooldown = 0.2f;
-    private bool isDead = false;
+    internal bool isDead = false;
 
     public WeaponBase currentWeapon;
     public Transform WeaponHolder;
@@ -62,16 +62,19 @@ public class PlayerController : MonoBehaviour, IHealth
 
         controller.enabled = false;
 
-        if (TryGetComponent<Rigidbody>(out var rb) == false)
+        if (!TryGetComponent<Rigidbody>(out var rb))
             rb = gameObject.AddComponent<Rigidbody>();
 
         rb.constraints = RigidbodyConstraints.FreezeRotation;
-        rb.mass = 50f;
-        rb.AddForce(-transform.forward * 10f, ForceMode.Impulse);
+        rb.mass = 10f;
+
+        rb.isKinematic = false;
+        rb.AddForce(-transform.forward * 50f + Vector3.up * 10f, ForceMode.Impulse);
 
         animator?.Play("Death");
 
         enabled = false;
+        gameObject.layer = LayerMask.NameToLayer("DeadBody");
     }
 
     public WeaponPickup GetNearbyWeapon() => nearbyWeapon;

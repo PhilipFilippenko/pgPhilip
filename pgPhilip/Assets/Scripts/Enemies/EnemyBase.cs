@@ -5,26 +5,26 @@ namespace Assets.Scripts.Enemies
 {
     public abstract class EnemyBase : MonoBehaviour, IHealth
     {
-        private int health = 1;
-        private float attackRange = 2f;
-        private float visionAngle = 1.5f * Mathf.PI;
-        private float memoryTime = 1f;
-        private float accelerationTime = 0.3f;
-        private float maxSpeed = 13f;
-        private float rotationSpeed = 15f;
+        protected int health = 1;
+        protected float attackRange = 2f;
+        protected float visionAngle = 1.5f * Mathf.PI;
+        protected float memoryTime = 1f;
+        protected float accelerationTime = 0.3f;
+        protected float maxSpeed = 13f;
+        protected float rotationSpeed = 15f;
 
-        private ExitManager exitManager;
-        private PlayerController player;
-        private NavMeshAgent agent;
-        private Animator animator;
+        protected ExitManager exitManager;
+        protected PlayerController player;
+        protected NavMeshAgent agent;
+        protected Animator animator;
+        protected WeaponBase currentWeapon;
 
         private Vector3 lastSeenPosition;
         private bool playerVisible;
         private float timeSinceLastSeen = 0f;
         private float reactionTime;
         private float reactionCooldown = 0.2f;
-
-        private WeaponBase currentWeapon;
+        private bool hasPlayedAttackAnim = false;
 
         private enum EnemyState { Idle, Chase, Attack }
         private EnemyState currentState = EnemyState.Idle;
@@ -35,7 +35,6 @@ namespace Assets.Scripts.Enemies
             exitManager = FindObjectOfType<ExitManager>();
             agent = GetComponent<NavMeshAgent>();
             currentWeapon = GetComponentInChildren<WeaponBase>();
-
             animator = GetComponentInChildren<Animator>();
 
             agent.updateRotation = false;
@@ -48,12 +47,17 @@ namespace Assets.Scripts.Enemies
         {
             reactionTime -= Time.deltaTime;
             UpdateState();
-
             UpdateAnimatorMovement();
         }
 
         private void UpdateState()
         {
+            if (player != null && player.isDead)
+            {
+                SetState(EnemyState.Idle);
+                return;
+            }
+
             playerVisible = CanSeePlayer();
 
             if (playerVisible)
@@ -71,9 +75,7 @@ namespace Assets.Scripts.Enemies
                 case EnemyState.Idle:
                     agent.speed = 2f;
                     if (playerVisible)
-                    {
                         SetState(EnemyState.Chase);
-                    }
                     break;
 
                 case EnemyState.Chase:
@@ -89,11 +91,8 @@ namespace Assets.Scripts.Enemies
                         SmoothRotateTo(lastSeenPosition);
 
                         float distanceSqr = (transform.position - player.transform.position).sqrMagnitude;
-
                         if (distanceSqr < attackRange * attackRange)
-                        {
                             SetState(EnemyState.Attack);
-                        }
                     }
                     break;
 
@@ -110,8 +109,11 @@ namespace Assets.Scripts.Enemies
                     }
                     else
                     {
-                        animator.Play("MeleeAttack_OneHanded", 0, 0f);
-                        currentWeapon?.Attack();
+                        if (!hasPlayedAttackAnim)
+                        {
+                            OnAttack();
+                            hasPlayedAttackAnim = true;
+                        }
                     }
                     break;
             }
@@ -122,13 +124,15 @@ namespace Assets.Scripts.Enemies
             if (agent == null || animator == null) return;
 
             Vector3 localDir = transform.InverseTransformDirection(agent.velocity.normalized);
-
             animator.SetFloat("moveX", localDir.x);
             animator.SetFloat("moveZ", localDir.z);
         }
 
         private void SetState(EnemyState newState)
         {
+            if (newState != currentState && newState != EnemyState.Attack)
+                hasPlayedAttackAnim = false;
+
             currentState = newState;
         }
 
@@ -172,12 +176,32 @@ namespace Assets.Scripts.Enemies
 
         private void Die()
         {
+            if (agent != null) agent.enabled = false;
+
+            if (!TryGetComponent<Rigidbody>(out var rb))
+                rb = gameObject.AddComponent<Rigidbody>();
+
+            rb.constraints = RigidbodyConstraints.FreezeRotation;
+            rb.mass = 10f;
+            rb.isKinematic = false;
+
+            Vector3 directionFromPlayer = (transform.position - player.transform.position).normalized;
+            Vector3 force = directionFromPlayer * 80f + Vector3.up * 10f;
+
+            rb.AddForce(force, ForceMode.Impulse);
+
+            animator?.Play("Death");
+
+            this.enabled = false;
+
             OnDeath();
+            gameObject.layer = LayerMask.NameToLayer("DeadBody");
             exitManager?.EnemyDefeated();
-            Destroy(gameObject);
         }
 
         protected virtual void OnDeath() { }
+
+        protected virtual void OnAttack() { }
 
         public void EquipWeapon(WeaponBase weapon)
         {
