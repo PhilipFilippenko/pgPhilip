@@ -65,7 +65,13 @@ public abstract class WeaponBase : MonoBehaviour
             spawnPos.y = 1f;
 
             GameObject pickupInstance = Instantiate(pickupTemplate, spawnPos, Quaternion.identity);
+            pickupInstance.name = pickupTemplate.name.Replace("(Clone)", "").Trim();
             pickupInstance.SetActive(true);
+        }
+
+        if (pickupTemplate != null && pickupTemplate.scene.IsValid())
+        {
+            Destroy(pickupTemplate);
         }
 
         Destroy(gameObject);
@@ -109,7 +115,7 @@ public abstract class WeaponBase : MonoBehaviour
     {
         if (!isThrown) return;
 
-        if (collision.gameObject.TryGetComponent<IHealth>(out IHealth entity))
+        if (collision.gameObject.TryGetComponent(out IHealth entity))
         {
             if (!(entity is PlayerController))
             {

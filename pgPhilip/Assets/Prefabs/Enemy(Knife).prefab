@@ -237,7 +237,7 @@ GameObject:
   - component: {fileID: 1262601295572897209}
   - component: {fileID: 3787664064897704553}
   m_Layer: 6
-  m_Name: Enemy
+  m_Name: Enemy(Knife)
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -583,6 +583,10 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: f0b720188542dcd47a5abd5869986900, type: 2}
+    - target: {fileID: 9500000, guid: bdd7a03fd93bf2d4cb6babd63ceabee8, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
