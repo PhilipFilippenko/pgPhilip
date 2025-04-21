@@ -23,8 +23,9 @@ public class PlayerMovement : MonoBehaviour
         if (player.movementDirection.magnitude > 0)
         {
             controller.Move(player.movementDirection * player.speed * Time.deltaTime);
-            var pos = player.transform.position;
-            pos.y = 1;
+
+            Vector3 pos = player.transform.position;
+            pos.y = 1f;
             player.transform.position = pos;
         }
 
@@ -37,11 +38,12 @@ public class PlayerMovement : MonoBehaviour
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         Plane groundPlane = new Plane(Vector3.up, player.transform.position);
+
         if (groundPlane.Raycast(ray, out float rayDistance))
         {
             Vector3 point = ray.GetPoint(rayDistance);
             Vector3 direction = (point - player.transform.position).normalized;
-            direction.y = 0;
+            direction.y = 0f;
 
             if (direction.sqrMagnitude > 0.01f)
             {

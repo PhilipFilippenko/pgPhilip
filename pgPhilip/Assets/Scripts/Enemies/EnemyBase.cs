@@ -8,7 +8,7 @@ namespace Assets.Scripts.Enemies
         protected int health = 1;
         protected float attackRange = 2f;
         protected float visionAngle = 1.5f * Mathf.PI;
-        protected float memoryTime = 1f;
+        protected float memoryTime = 1.5f;
         protected float accelerationTime = 0.3f;
         protected float maxSpeed = 13f;
         protected float rotationSpeed = 15f;
@@ -26,6 +26,8 @@ namespace Assets.Scripts.Enemies
         private float reactionCooldown = 0.2f;
         private bool hasPlayedAttackAnim = false;
 
+        private float nextFireTime = 0f;
+
         private enum EnemyState { Idle, Chase, Attack }
         private EnemyState currentState = EnemyState.Idle;
 
@@ -39,8 +41,9 @@ namespace Assets.Scripts.Enemies
 
             agent.updateRotation = false;
             agent.acceleration = maxSpeed / accelerationTime;
-
             reactionTime = reactionCooldown;
+
+            if (currentWeapon != null) currentWeapon.infiniteAmmo = true;
         }
 
         void Update()
@@ -48,6 +51,9 @@ namespace Assets.Scripts.Enemies
             reactionTime -= Time.deltaTime;
             UpdateState();
             UpdateAnimatorMovement();
+
+            if (currentState == EnemyState.Attack)
+                TryAttackRepeatedly();
         }
 
         private void UpdateState()
@@ -73,49 +79,97 @@ namespace Assets.Scripts.Enemies
             switch (currentState)
             {
                 case EnemyState.Idle:
-                    agent.speed = 2f;
-                    if (playerVisible)
-                        SetState(EnemyState.Chase);
+                    HandleIdleState();
                     break;
 
                 case EnemyState.Chase:
-                    agent.speed = maxSpeed;
-
-                    if (!playerVisible && timeSinceLastSeen > memoryTime)
-                    {
-                        SetState(EnemyState.Idle);
-                    }
-                    else
-                    {
-                        agent.SetDestination(lastSeenPosition);
-                        SmoothRotateTo(lastSeenPosition);
-
-                        float distanceSqr = (transform.position - player.transform.position).sqrMagnitude;
-                        if (distanceSqr < attackRange * attackRange)
-                            SetState(EnemyState.Attack);
-                    }
+                    HandleChaseState();
                     break;
 
                 case EnemyState.Attack:
-                    agent.speed = 0f;
-
-                    if (!playerVisible && timeSinceLastSeen > memoryTime)
-                    {
-                        SetState(EnemyState.Idle);
-                    }
-                    else if ((transform.position - player.transform.position).sqrMagnitude > attackRange * attackRange)
-                    {
-                        SetState(EnemyState.Chase);
-                    }
-                    else
-                    {
-                        if (!hasPlayedAttackAnim)
-                        {
-                            OnAttack();
-                            hasPlayedAttackAnim = true;
-                        }
-                    }
+                    HandleAttackState();
                     break;
+            }
+        }
+
+        private void HandleIdleState()
+        {
+            if (playerVisible) SetState(EnemyState.Chase);
+        }
+
+        private void HandleChaseState()
+        {
+            agent.speed = maxSpeed;
+
+            if (!playerVisible && timeSinceLastSeen > memoryTime)
+            {
+                SetState(EnemyState.Idle);
+                return;
+            }
+
+            agent.SetDestination(lastSeenPosition);
+            SmoothRotateTo(lastSeenPosition);
+
+            float range = currentWeapon != null ? currentWeapon.attackRange : attackRange;
+            float distanceSqr = (transform.position - player.transform.position).sqrMagnitude;
+
+            if (distanceSqr < range * range && playerVisible)
+                SetState(EnemyState.Attack);
+        }
+
+        private void HandleAttackState()
+        {
+            agent.speed = 0f;
+
+            float range = currentWeapon != null ? currentWeapon.attackRange : attackRange;
+            float distanceSqr = (transform.position - player.transform.position).sqrMagnitude;
+
+            if (!playerVisible)
+            {
+                if (timeSinceLastSeen > memoryTime)
+                {
+                    SetState(EnemyState.Idle);
+                }
+                else
+                {
+                    SetState(EnemyState.Chase);
+                }
+                return;
+            }
+
+            if (distanceSqr > range * range)
+            {
+                SetState(EnemyState.Chase);
+                return;
+            }
+
+            // Иначе атакуем
+            if (!hasPlayedAttackAnim)
+            {
+                OnAttack();
+                hasPlayedAttackAnim = true;
+            }
+        }
+
+
+        private void TryAttackRepeatedly()
+        {
+            if (!playerVisible || currentWeapon == null) return;
+            if (currentWeapon.weaponName == "Knife") return;
+
+            if (Time.time >= nextFireTime)
+            {
+                Vector3 shootDir = (player.transform.position - transform.position).normalized;
+
+                Vector3 lookPos = player.transform.position;
+                lookPos.y = transform.position.y;
+                transform.LookAt(lookPos);
+
+                if (currentWeapon.ShootAt(shootDir))
+                {
+                    animator?.Play("RifleShoot", 0, 0f);
+                    nextFireTime = Time.time + currentWeapon.fireRate;
+                }
             }
         }
 
@@ -156,10 +210,9 @@ namespace Assets.Scripts.Enemies
             if (angle < (visionAngle / 2f))
             {
                 if (Physics.Raycast(transform.position, directionToPlayer, out RaycastHit hit))
-                {
                     return hit.collider.CompareTag("Player");
-                }
             }
+
             return false;
         }
 
@@ -187,14 +240,19 @@ namespace Assets.Scripts.Enemies
 
             Vector3 directionFromPlayer = (transform.position - player.transform.position).normalized;
             Vector3 force = directionFromPlayer * 80f + Vector3.up * 10f;
-
             rb.AddForce(force, ForceMode.Impulse);
 
             animator?.Play("Death");
-
-            this.enabled = false;
+            enabled = false;
 
             OnDeath();
+
+            currentWeapon.gameObject.SetActive(false);
+
+            GameObject floatingPrefab = currentWeapon.GetFloatingWeaponPrefab();
+            Vector3 spawnPos = transform.position + Vector3.up * 1f;
+            Instantiate(floatingPrefab, spawnPos, Quaternion.identity);
+
             gameObject.layer = LayerMask.NameToLayer("DeadBody");
             exitManager?.EnemyDefeated();
         }
@@ -202,10 +260,5 @@ namespace Assets.Scripts.Enemies
         protected virtual void OnDeath() { }
 
         protected virtual void OnAttack() { }
-
-        public void EquipWeapon(WeaponBase weapon)
-        {
-            currentWeapon = weapon;
-        }
     }
 }

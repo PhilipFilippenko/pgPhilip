@@ -19,10 +19,7 @@ public class ExitManager : MonoBehaviour
     public void EnemyDefeated()
     {
         enemyCount--;
-        if (enemyCount <= 0)
-        {
-            ActivatePortal();
-        }
+        if (enemyCount <= 0) ActivatePortal();
     }
 
     private void ActivatePortal()
@@ -33,14 +30,11 @@ public class ExitManager : MonoBehaviour
 
     private void UpdateExitMaterial()
     {
-        if (exitPortal != null)
-        {
-            Renderer renderer = exitPortal.GetComponent<Renderer>();
-            if (renderer != null)
-            {
-                renderer.material = portalActive ? ExitGreenMAT : ExitRedMAT;
-            }
-        }
+        if (exitPortal == null) return;
+
+        Renderer renderer = exitPortal.GetComponent<Renderer>();
+        if (renderer != null)
+            renderer.material = portalActive ? ExitGreenMAT : ExitRedMAT;
     }
 
     void OnTriggerEnter(Collider other)

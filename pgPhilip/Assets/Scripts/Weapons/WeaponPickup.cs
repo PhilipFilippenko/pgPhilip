@@ -26,14 +26,27 @@ public class WeaponPickup : MonoBehaviour
     {
         transform.Rotate(Vector3.up * rotationSpeed * Time.deltaTime);
 
-        float newY = transform.position.y + (movingUp ? floatSpeed : -floatSpeed) * Time.deltaTime;
-        if (newY >= startPosition.y + floatHeight) movingUp = false;
-        if (newY <= startPosition.y - floatHeight) movingUp = true;
+        float direction = movingUp ? floatSpeed : -floatSpeed;
+        float newY = transform.position.y + direction * Time.deltaTime;
 
-        transform.position = new Vector3(transform.position.x, newY, transform.position.z);
+        if (newY >= startPosition.y + floatHeight)
+        {
+            movingUp = false;
+        }
+
+        if (newY <= startPosition.y - floatHeight)
+        {
+            movingUp = true;
+        }
+
+        transform.position = new Vector3(
+            transform.position.x,
+            newY,
+            transform.position.z
+        );
     }
 
-    public void updateUsedStatus(int ammoLeft)
+    public void UpdateUsedStatus(int ammoLeft)
     {
         remainingAmmo = ammoLeft;
         isUsed = true;
@@ -52,8 +65,9 @@ public class WeaponPickup : MonoBehaviour
         if (other.TryGetComponent<PlayerController>(out var player))
         {
             if (player.GetNearbyWeapon() == this)
+            {
                 player.SetNearbyWeapon(null);
+            }
         }
     }
-
 }

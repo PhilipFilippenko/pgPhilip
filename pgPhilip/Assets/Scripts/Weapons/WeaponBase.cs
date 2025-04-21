@@ -2,22 +2,27 @@ using UnityEngine;
 
 public abstract class WeaponBase : MonoBehaviour
 {
-    public string weaponName;
-    public int ammo;
-    public int maxAmmo;
-    public float fireRate;
-    public float attackRange = 1.5f;
-    public bool isMelee = false;
+    internal string weaponName;
+    internal int ammo;
+    internal int maxAmmo;
+    internal float fireRate;
+    internal float attackRange;
+    internal float bulletSpawnOffset = 1f;
+    internal bool isMelee = false;
+    internal bool infiniteAmmo = false;
     public GameObject bulletPrefab;
-    internal float throwDamage = 1f;
+    public GameObject floatingWeaponPrefab;
 
     protected float nextFireTime = 0f;
+
     private Collider weaponCollider;
     private bool isThrown = false;
     private Rigidbody rb;
     private float timeSinceLastMovement = 0.1f;
     private float movementThreshold = 0.1f;
+
     private GameObject pickupTemplate;
+    private WeaponData weaponData;
 
     void Awake()
     {
@@ -29,9 +34,19 @@ public abstract class WeaponBase : MonoBehaviour
         return false;
     }
 
-    public virtual bool Attack() 
+    public virtual bool Attack()
     {
         return false;
+    }
+
+    public GameObject GetFloatingWeaponPrefab()
+    {
+        return floatingWeaponPrefab;
+    }
+
+    public bool ShootAt(Vector3 direction)
+    {
+        return TryShoot(direction);
     }
 
     public void DisableCollider()
@@ -42,42 +57,6 @@ public abstract class WeaponBase : MonoBehaviour
         }
     }
 
-    void Update()
-    {
-        if (isThrown && rb != null)
-        {
-            if (rb.velocity.magnitude < movementThreshold)
-                timeSinceLastMovement -= Time.deltaTime;
-
-            if (timeSinceLastMovement <= 0)
-            {
-                ConvertToPickup();
-            }
-        }
-    }
-
-
-    private void ConvertToPickup()
-    {
-        if (pickupTemplate != null)
-        {
-            Vector3 spawnPos = transform.position;
-            spawnPos.y = 1f;
-
-            GameObject pickupInstance = Instantiate(pickupTemplate, spawnPos, Quaternion.identity);
-            pickupInstance.name = pickupTemplate.name.Replace("(Clone)", "").Trim();
-            pickupInstance.SetActive(true);
-        }
-
-        if (pickupTemplate != null && pickupTemplate.scene.IsValid())
-        {
-            Destroy(pickupTemplate);
-        }
-
-        Destroy(gameObject);
-    }
-
-
     public void EnableCollider()
     {
         if (weaponCollider != null)
@@ -86,10 +65,47 @@ public abstract class WeaponBase : MonoBehaviour
         }
     }
 
+    void Update()
+    {
+        if (isThrown && rb != null)
+        {
+            if (rb.velocity.magnitude < movementThreshold)
+            {
+                timeSinceLastMovement -= Time.deltaTime;
+            }
+
+            if (timeSinceLastMovement <= 0)
+            {
+                ConvertToPickup();
+            }
+        }
+    }
+
+    private void ConvertToPickup()
+    {
+        Vector3 spawnPos = transform.position;
+        spawnPos.y = 1f;
+
+        GameObject pickupInstance = Instantiate(pickupTemplate, spawnPos, Quaternion.identity);
+        pickupInstance.name = pickupTemplate.name.Replace("(Clone)", "").Trim();
+        pickupInstance.SetActive(true);
+
+        pickupInstance.TryGetComponent(out WeaponPickup pickup);
+        pickup.UpdateUsedStatus(weaponData.ammo);
+
+        Destroy(pickupTemplate);
+        Destroy(gameObject);
+    }
+
     internal void Thrown(Rigidbody newRB)
     {
         isThrown = true;
         rb = newRB;
+
+        rb.useGravity = true;
+        rb.drag = 1f;
+        rb.angularDrag = 2f;
+
         timeSinceLastMovement = 0.1f;
 
         if (weaponCollider == null)
@@ -102,14 +118,19 @@ public abstract class WeaponBase : MonoBehaviour
         }
 
         weaponCollider.enabled = true;
+
+        if (weaponData != null)
+        {
+            weaponData.ammo = ammo;
+        }
     }
 
     internal void SetPickupTemplate(GameObject template)
-    { 
-        pickupTemplate = Instantiate(template); 
+    {
+        pickupTemplate = Instantiate(template);
         pickupTemplate.SetActive(false);
+        weaponData = new WeaponData(ammo);
     }
-
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -120,25 +141,28 @@ public abstract class WeaponBase : MonoBehaviour
             if (!(entity is PlayerController))
             {
                 entity.TakeDamage();
-                Debug.Log("Weapon hit an enemy!");
             }
 
-            if (rb != null)
-                rb.velocity = new Vector3(0, rb.velocity.y, 0);
+            rb.velocity = new Vector3(0, rb.velocity.y, 0);
         }
     }
 
     protected bool TryShoot(Vector3 shootDirection)
     {
-        if (ammo > 0 && Time.time >= nextFireTime)
+        if ((ammo > 0 || infiniteAmmo) && Time.time >= nextFireTime)
         {
             nextFireTime = Time.time + fireRate;
-            ammo--;
+
+            if (!infiniteAmmo)
+                ammo--;
 
             Vector3 spawnPosition = transform.root.position + shootDirection;
+            spawnPosition.y = 1f;
+
             Instantiate(bulletPrefab, spawnPosition, Quaternion.LookRotation(shootDirection));
             return true;
         }
+
         return false;
     }
 
@@ -150,7 +174,6 @@ public abstract class WeaponBase : MonoBehaviour
             if (hit.TryGetComponent<IHealth>(out var target))
             {
                 if (target == transform.root.GetComponent<IHealth>()) continue;
-
                 if (hit.CompareTag(gameObject.tag)) continue;
 
                 if (target is Component targetComponent)
@@ -167,11 +190,4 @@ public abstract class WeaponBase : MonoBehaviour
 
         return false;
     }
-
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
-    }
-
 }
