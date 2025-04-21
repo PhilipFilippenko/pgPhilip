@@ -19,6 +19,7 @@ public class PlayerWeaponHandler : MonoBehaviour
         player.currentWeapon = newWeapon;
 
         Transform grip = newWeapon.transform.Find("GripPoint");
+
         newWeapon.transform.SetParent(player.WeaponHolder, false);
         newWeapon.transform.localPosition = -grip.localPosition;
         newWeapon.transform.localRotation = Quaternion.Inverse(grip.localRotation);
@@ -30,15 +31,20 @@ public class PlayerWeaponHandler : MonoBehaviour
         WeaponPickup nearby = player.GetNearbyWeapon();
         if (nearby == null) return;
 
-        GameObject instance = Instantiate(nearby.weaponPrefab, player.WeaponHolder.position, player.WeaponHolder.rotation);
+        GameObject instance = Instantiate(
+            nearby.weaponPrefab,
+            player.WeaponHolder.position,
+            player.WeaponHolder.rotation
+        );
+
         WeaponBase weapon = instance.GetComponent<WeaponBase>();
 
         if (nearby.isUsed)
             weapon.ammo = nearby.remainingAmmo;
 
         weapon.SetPickupTemplate(nearby.gameObject);
-
         EquipWeapon(weapon);
+
         Destroy(nearby.gameObject);
         player.SetNearbyWeapon(null);
     }
@@ -59,6 +65,7 @@ public class PlayerWeaponHandler : MonoBehaviour
 
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
         rb.isKinematic = false;
+
         rb.AddForce(player.transform.forward * 1000f + Vector3.up * 200f);
         rb.AddTorque(Random.insideUnitSphere * 300f);
 

@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace Assets.Scripts.Enemies
 {
     public class EnemyGuard : EnemyBase
@@ -15,7 +17,9 @@ namespace Assets.Scripts.Enemies
             }
             else
             {
-                currentWeapon.Shoot();
+                Vector3 shootDir = (player.transform.position - transform.position).normalized;
+                if (currentWeapon.ShootAt(shootDir))
+                    animator.Play("RifleShoot", 0, 0f);
             }
         }
     }

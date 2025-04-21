@@ -78,14 +78,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1c080121e4c96f47884b3deddfa4879, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponName: 
-  ammo: 0
-  maxAmmo: 0
-  fireRate: 0
-  attackRange: 1.5
-  isMelee: 0
   bulletPrefab: {fileID: 3836168309207113132, guid: e73f9fd40939b5b4d94fa57da7b274ff, type: 3}
-  bulletSpawnOffset: 1
+  floatingWeaponPrefab: {fileID: 4110304631776508063, guid: 9ea5cfa42e32ef047bf8c15145593454, type: 3}
 --- !u!65 &3084466968833348219
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -17,26 +17,42 @@ public class PlayerCombat : MonoBehaviour
 
     public void HandleShooting()
     {
-        if (player.currentWeapon == null) return;
+        if (player.currentWeapon == null)
+        {
+            return;
+        }
 
         string name = player.currentWeapon.weaponName;
 
-        if (name == "Knife" && Input.GetMouseButtonDown(0) && canAttack)
+        if (name == "Knife")
         {
-            canAttack = false;
-            animator.Play("MeleeAttack_OneHanded", 0, 0f);
-            player.currentWeapon.Attack();
-            StartCoroutine(ResetCooldown());
+            if (Input.GetMouseButtonDown(0) && canAttack)
+            {
+                canAttack = false;
+                animator.Play("MeleeAttack_OneHanded", 0, 0f);
+                player.currentWeapon.Attack();
+                StartCoroutine(ResetCooldown());
+            }
         }
-        else if (name == "Rifle" && Input.GetMouseButton(0))
+        else if (name == "Rifle")
         {
-            if (player.currentWeapon.Shoot())
-                animator.Play("RifleShoot", 0, 0f);
+            if (Input.GetMouseButton(0))
+            {
+                if (player.currentWeapon.Shoot())
+                {
+                    animator.Play("RifleShoot", 0, 0f);
+                }
+            }
         }
-        else if (name == "Pistol" && Input.GetMouseButtonDown(0))
+        else if (name == "Pistol")
         {
-            if (player.currentWeapon.Shoot())
-                animator.Play("RifleShoot", 0, 0f);
+            if (Input.GetMouseButtonDown(0))
+            {
+                if (player.currentWeapon.Shoot())
+                {
+                    animator.Play("RifleShoot", 0, 0f);
+                }
+            }
         }
     }
 

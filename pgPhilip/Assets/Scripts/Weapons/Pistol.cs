@@ -2,14 +2,13 @@ using UnityEngine;
 
 public class Pistol : WeaponBase
 {
-    public float bulletSpawnOffset = 1f;
-
     void Awake()
     {
         weaponName = "Pistol";
         ammo = 6;
         maxAmmo = ammo;
-        fireRate = 0.15f;
+        fireRate = 0.2f;
+        attackRange = 20f;
     }
 
     public override bool Shoot()
