@@ -2,7 +2,7 @@
 - Project name: pgPhilip
 - Unity version: Unity 2022.3.33f1
 - Active game object:
-  - Name: Pistol
+  - Name: Bennelli_M4
   - Tag: Untagged
-  - Layer: Weapon
+  - Layer: Default
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->

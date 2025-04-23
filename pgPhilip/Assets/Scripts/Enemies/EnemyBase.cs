@@ -24,7 +24,10 @@ namespace Assets.Scripts.Enemies
         private float timeSinceLastSeen = 0f;
         private float reactionTime;
         private float reactionCooldown = 0.2f;
+        private float stunTimer = 0f;
         private bool hasPlayedAttackAnim = false;
+        private bool isDead = false;
+        private bool isStunned = false;
 
         private float nextFireTime = 0f;
 
@@ -48,6 +51,18 @@ namespace Assets.Scripts.Enemies
 
         void Update()
         {
+            if (isStunned)
+            {
+                stunTimer -= Time.deltaTime;
+                if (stunTimer <= 0f)
+                {
+                    isStunned = false;
+                    agent.isStopped = false;
+                    animator.SetBool("isStunned", false);
+                }
+                return;
+            }
+
             reactionTime -= Time.deltaTime;
             UpdateState();
             UpdateAnimatorMovement();
@@ -68,6 +83,9 @@ namespace Assets.Scripts.Enemies
 
             if (playerVisible)
             {
+                if (timeSinceLastSeen > 0f)
+                    reactionTime = reactionCooldown;
+
                 lastSeenPosition = player.transform.position;
                 timeSinceLastSeen = 0f;
             }
@@ -90,6 +108,19 @@ namespace Assets.Scripts.Enemies
                     HandleAttackState();
                     break;
             }
+        }
+
+        public void Stun()
+        {
+            if (isStunned) return;
+
+            isStunned = true;
+            stunTimer = 3f;
+            agent.isStopped = true;
+
+            animator.SetBool("isStunned", true);
+            animator.SetFloat("moveX", 0f);
+            animator.SetFloat("moveZ", 0f);
         }
 
         private void HandleIdleState()
@@ -143,7 +174,6 @@ namespace Assets.Scripts.Enemies
                 return;
             }
 
-            // Иначе атакуем
             if (!hasPlayedAttackAnim)
             {
                 OnAttack();
@@ -154,6 +184,7 @@ namespace Assets.Scripts.Enemies
 
         private void TryAttackRepeatedly()
         {
+            if (reactionTime > 0f) return;
             if (!playerVisible || currentWeapon == null) return;
             if (currentWeapon.weaponName == "Knife") return;
 
@@ -229,6 +260,9 @@ namespace Assets.Scripts.Enemies
 
         private void Die()
         {
+            if (isDead) return;
+            isDead = true;
+
             if (agent != null) agent.enabled = false;
 
             if (!TryGetComponent<Rigidbody>(out var rb))

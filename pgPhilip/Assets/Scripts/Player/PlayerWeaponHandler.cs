@@ -57,7 +57,7 @@ public class PlayerWeaponHandler : MonoBehaviour
 
         Transform weaponTransform = player.currentWeapon.transform;
         weaponTransform.SetParent(null);
-        weaponTransform.position = player.transform.position + player.transform.forward * 2f;
+        weaponTransform.position = player.transform.position + player.transform.forward * 0.1f;
 
         Rigidbody rb = weaponTransform.GetComponent<Rigidbody>();
         if (rb == null)
@@ -70,7 +70,16 @@ public class PlayerWeaponHandler : MonoBehaviour
         rb.AddTorque(Random.insideUnitSphere * 300f);
 
         player.currentWeapon.Thrown(rb);
-        player.currentWeapon.EnableCollider();
+
+        Collider[] playerColliders = player.GetComponentsInChildren<Collider>();
+        Collider weaponCollider = weaponTransform.GetComponent<Collider>();
+
+        foreach (var col in playerColliders)
+        {
+            if (weaponCollider != null)
+                Physics.IgnoreCollision(weaponCollider, col);
+        }
+
         player.currentWeapon = null;
     }
 }

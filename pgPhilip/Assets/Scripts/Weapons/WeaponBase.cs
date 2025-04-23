@@ -1,3 +1,4 @@
+using Assets.Scripts.Enemies;
 using UnityEngine;
 
 public abstract class WeaponBase : MonoBehaviour
@@ -7,7 +8,7 @@ public abstract class WeaponBase : MonoBehaviour
     internal int maxAmmo;
     internal float fireRate;
     internal float attackRange;
-    internal float bulletSpawnOffset = 1f;
+    internal float bulletSpawnOffset = 0.1f;
     internal bool isMelee = false;
     internal bool infiniteAmmo = false;
     public GameObject bulletPrefab;
@@ -138,9 +139,9 @@ public abstract class WeaponBase : MonoBehaviour
 
         if (collision.gameObject.TryGetComponent(out IHealth entity))
         {
-            if (!(entity is PlayerController))
+            if (entity is EnemyBase enemy)
             {
-                entity.TakeDamage();
+                enemy.Stun();
             }
 
             rb.velocity = new Vector3(0, rb.velocity.y, 0);
@@ -159,7 +160,17 @@ public abstract class WeaponBase : MonoBehaviour
             Vector3 spawnPosition = transform.root.position + shootDirection;
             spawnPosition.y = 1f;
 
-            Instantiate(bulletPrefab, spawnPosition, Quaternion.LookRotation(shootDirection));
+            GameObject bulletObj = Instantiate(bulletPrefab, spawnPosition, Quaternion.LookRotation(shootDirection));
+            Bullet bullet = bulletObj.GetComponent<Bullet>();
+            bullet.Initialize(shootDirection, transform.root.gameObject);
+
+            Collider ownerCollider = GetComponent<Collider>();
+            Collider bulletCollider = bulletObj.GetComponent<Collider>();
+            if (ownerCollider != null && bulletCollider != null)
+            {
+                Physics.IgnoreCollision(bulletCollider, ownerCollider);
+            }
+
             return true;
         }
 
