@@ -15,6 +15,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void HandleMovement()
     {
+        if (!controller.enabled) return;
         float moveX = Input.GetAxisRaw("Horizontal");
         float moveZ = Input.GetAxisRaw("Vertical");
 
@@ -36,6 +37,8 @@ public class PlayerMovement : MonoBehaviour
 
     public void RotateTowardsMouse()
     {
+        if (!controller.enabled) return;
+
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         Plane groundPlane = new Plane(Vector3.up, player.transform.position);
 
