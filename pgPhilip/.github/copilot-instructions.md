@@ -2,7 +2,7 @@
 - Project name: pgPhilip
 - Unity version: Unity 2022.3.33f1
 - Active game object:
-  - Name: Bennelli_M4
-  - Tag: Untagged
-  - Layer: Default
+  - Name: Player
+  - Tag: Player
+  - Layer: Player
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->

@@ -18,18 +18,22 @@ namespace Assets.Scripts.Enemies
         protected NavMeshAgent agent;
         protected Animator animator;
         protected WeaponBase currentWeapon;
-
+       
         private Vector3 lastSeenPosition;
         private bool playerVisible;
+        private int executionHits = 0;
         private float timeSinceLastSeen = 0f;
         private float reactionTime;
         private float reactionCooldown = 0.2f;
         private float stunTimer = 0f;
+        private float nextFireTime = 0f;
         private bool hasPlayedAttackAnim = false;
         private bool isDead = false;
         private bool isStunned = false;
+        private bool beingExecuted = false;
 
-        private float nextFireTime = 0f;
+        internal bool IsStunned() => isStunned;
+        internal bool IsDead() => isDead;
 
         private enum EnemyState { Idle, Chase, Attack }
         private EnemyState currentState = EnemyState.Idle;
@@ -53,12 +57,15 @@ namespace Assets.Scripts.Enemies
         {
             if (isStunned)
             {
-                stunTimer -= Time.deltaTime;
-                if (stunTimer <= 0f)
+                if (!beingExecuted)
                 {
-                    isStunned = false;
-                    agent.isStopped = false;
-                    animator.SetBool("isStunned", false);
+                    stunTimer -= Time.deltaTime;
+                    if (stunTimer <= 0f)
+                    {
+                        isStunned = false;
+                        agent.isStopped = false;
+                        animator.SetBool("isStunned", false);
+                    }
                 }
                 return;
             }
@@ -258,8 +265,37 @@ namespace Assets.Scripts.Enemies
             if (health <= 0) Die();
         }
 
+        public void StartExecution()
+        {
+            if (!isStunned || isDead || beingExecuted) return;
+
+            beingExecuted = true;
+            isStunned = true;
+            stunTimer = 999f;
+            agent.isStopped = true;
+
+            animator.SetBool("isStunned", true);
+            animator.SetFloat("moveX", 0f);
+            animator.SetFloat("moveZ", 0f);
+        }
+
+
+        public void ReceiveExecutionHit()
+        {
+            if (!beingExecuted || isDead) return;
+
+            executionHits++;
+            animator.Play("GetHit", 0, 0f);
+
+            if (executionHits >= 3)
+            {
+                Die();
+            }
+        }
+
         private void Die()
         {
+            beingExecuted = false;
             if (isDead) return;
             isDead = true;
 

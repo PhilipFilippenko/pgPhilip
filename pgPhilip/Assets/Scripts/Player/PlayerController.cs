@@ -37,10 +37,7 @@ public class PlayerController : MonoBehaviour, IHealth
 
     void Update()
     {
-        if (isDead)
-        {
-            return;
-        }
+        if (isDead) return;
 
         movement.HandleMovement();
         movement.RotateTowardsMouse();
@@ -51,24 +48,27 @@ public class PlayerController : MonoBehaviour, IHealth
             weaponHandler.ThrowWeapon();
             weaponHandler.EquipNearbyWeapon();
         }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (currentWeapon != null)
+            {
+                weaponHandler.ThrowWeapon();
+            }
+
+            combat.TryStartExecution();
+        }
     }
 
     public void TakeDamage()
     {
         health--;
-
-        if (health <= 0)
-        {
-            Die();
-        }
+        if (health <= 0) Die();
     }
 
     private void Die()
     {
-        if (isDead)
-        {
-            return;
-        }
+        if (isDead) return;
 
         isDead = true;
         controller.enabled = false;
@@ -83,20 +83,12 @@ public class PlayerController : MonoBehaviour, IHealth
         rb.isKinematic = false;
 
         rb.AddForce(-transform.forward * 50f + Vector3.up * 10f, ForceMode.Impulse);
-
         animator?.Play("Death");
 
         enabled = false;
         gameObject.layer = LayerMask.NameToLayer("DeadBody");
     }
 
-    public WeaponPickup GetNearbyWeapon()
-    {
-        return nearbyWeapon;
-    }
-
-    public void SetNearbyWeapon(WeaponPickup pickup)
-    {
-        nearbyWeapon = pickup;
-    }
+    public WeaponPickup GetNearbyWeapon() => nearbyWeapon;
+    public void SetNearbyWeapon(WeaponPickup pickup) => nearbyWeapon = pickup;
 }
