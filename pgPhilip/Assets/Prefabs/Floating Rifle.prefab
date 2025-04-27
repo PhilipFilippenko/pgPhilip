@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 6246239359521432475}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -47,7 +47,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponPrefab: {fileID: 1314274499441548170, guid: bbf07331c9062ee44a25506f09b546e6, type: 3}
-  pickupPrefab: {fileID: 6246239359521432475}
   isUsed: 0
   remainingAmmo: 0
 --- !u!65 &3899909942299474827
@@ -79,6 +78,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7844333031901648825}
     m_Modifications:
+    - target: {fileID: 182346678317486963, guid: bbf07331c9062ee44a25506f09b546e6, type: 3}
+      propertyPath: floatingWeaponPrefab
+      value: 
+      objectReference: {fileID: 6246239359521432475}
     - target: {fileID: 1314274499441548170, guid: bbf07331c9062ee44a25506f09b546e6, type: 3}
       propertyPath: m_Name
       value: Rifle
