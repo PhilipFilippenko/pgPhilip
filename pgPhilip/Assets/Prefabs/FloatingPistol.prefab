@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 4110304631776508063}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -47,7 +47,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponPrefab: {fileID: 8857277035784525966, guid: eb8249b741f9292409795a943de2417c, type: 3}
-  pickupPrefab: {fileID: 4110304631776508063}
   isUsed: 0
   remainingAmmo: 0
 --- !u!65 &-8339229923417103207
@@ -79,6 +78,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4675679412355678193}
     m_Modifications:
+    - target: {fileID: 3071349043379426444, guid: eb8249b741f9292409795a943de2417c, type: 3}
+      propertyPath: floatingWeaponPrefab
+      value: 
+      objectReference: {fileID: 4110304631776508063}
     - target: {fileID: 3125073755356498739, guid: eb8249b741f9292409795a943de2417c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

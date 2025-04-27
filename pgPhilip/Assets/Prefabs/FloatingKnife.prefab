@@ -224,7 +224,7 @@ Transform:
   m_GameObject: {fileID: 4915891902541329339}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3, y: 1, z: -11}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 3, y: 3, z: 3}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -244,7 +244,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponPrefab: {fileID: 2254667879243526999, guid: 7f030640f43efb947a6f2b188cd1f93a, type: 3}
-  pickupPrefab: {fileID: 4915891902541329339}
   isUsed: 0
   remainingAmmo: 0
 --- !u!65 &6992405825979237596
@@ -315,14 +314,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7ee7ea79d4676042b105f5dbcb1fe57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponName: 
-  ammo: 0
-  maxAmmo: 0
-  fireRate: 0
-  attackRange: 1.5
-  isMelee: 0
   bulletPrefab: {fileID: 0}
-  pickupTemplate: {fileID: 0}
+  floatingWeaponPrefab: {fileID: 0}
 --- !u!65 &3084534746663001168
 BoxCollider:
   m_ObjectHideFlags: 0
