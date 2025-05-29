@@ -9,7 +9,7 @@ public class Rifle : WeaponBase
         maxAmmo = ammo;
         fireRate = 0.05f;
         attackRange = 20f;
-}
+    }
 
     public override bool Shoot()
     {
